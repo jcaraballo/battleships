@@ -48,7 +48,9 @@ class FleetTest extends JUnitSuite {
   }
 
   @Test def shootAtReturnsItselfPlusWaterIfThereIsNoShipInSuchPosition(){
-    fleetWithoutShipAtTenTen.shootAt(pos(10, 10))
+    expect((fleetWithoutShipAtTenTen, "water")){
+      fleetWithoutShipAtTenTen.shootAt(pos(10, 10))
+    }
   }
 
   @Test def shootAtReturnsUpdatedSelfPlusHitIfThereIsShipInSuchPositionThatDoesNotSink(){

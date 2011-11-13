@@ -4,6 +4,9 @@ import org.junit.Test
 import org.casa.battleships.Position.pos
 import org.scalatest.junit.JUnitSuite
 import org.casa.battleships.fleet._
+import org.mockito.Mockito._
+import org.junit.Assert.assertThat
+import org.hamcrest.CoreMatchers.is
 
 class BoardTest extends JUnitSuite {
   val fleet: Fleet = new Fleet(
@@ -18,21 +21,17 @@ class BoardTest extends JUnitSuite {
     new Board(10, fleet)
   }
 
-  @Test def shootReturnsWaterIfNoShipIsPlacedThere(){
-    expect("water"){new Board(10, fleet).shoot(pos(10, 10))}
-  } 
+  @Test def shootDelegatesToFleetAndUpdatesShotPositions(){
+    val position: Position = mock(classOf[Position])
+    val outcome: String = "some outcome"
+    val fleet: Fleet = mock(classOf[Fleet])
+    val updatedFleet: Fleet = mock(classOf[Fleet])
 
-  @Test def shootReturnsHitIfThereIsAShipThereThatHasOtherPartsThatHaveNotBeenHit(){
-    expect("hit"){new Board(10, fleet).shoot(pos(1, 1))}
-  }
+    when(fleet.shootAt(position)).thenReturn((updatedFleet, outcome))
 
-  @Test def shootReturnsSunkWhenThereIsAShipThereWhichAllOtherPartsHaveBeenHit(){
-    val b: Board = new Board(10, fleet)
-    expect("hit"){b.shoot(pos(1, 1))}
-    expect("hit"){b.shoot(pos(2, 1))}
-    expect("hit"){b.shoot(pos(3, 1))}
-    expect("hit"){b.shoot(pos(4, 1))}
-    expect("sunk"){b.shoot(pos(5, 1))}
+    val board: Board = new Board(10, fleet)
+    assertThat(board.shoot(position), is(outcome))
+    assertThat(board.shotPositions, is(Set(position)))
   }
 
   @Test def shootableExcludesAlreadyShotSquares(){
