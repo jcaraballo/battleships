@@ -10,15 +10,14 @@ class AimAtNextToHitShooter(chooser: PositionChooser)(delegate: Shooter) extends
 
     lastNonWaterShot match {
       case None => delegate.shoot(shootable, history)
-      case Some((position: Position, outcome: ShotOutcome.Value)) => {
-        if (outcome == Hit) {
-          chooser.choose(Positions.neighbours(position) & shootable) match {
-            case Some(position) => Some(position)
-            case _ => delegate.shoot(shootable, history)
-          }
-        } else {
-          delegate.shoot(shootable, history)
+      case Some((position: Position, Hit)) => {
+        chooser.choose(Positions.neighbours(position) & shootable) match {
+          case Some(positionToShoot) => Some(positionToShoot)
+          case _ => delegate.shoot(shootable, history)
         }
+      }
+      case _ => {
+        delegate.shoot(shootable, history)
       }
     }
   }
