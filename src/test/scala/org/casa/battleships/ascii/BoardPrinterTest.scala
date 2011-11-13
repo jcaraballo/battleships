@@ -9,8 +9,8 @@ import org.junit.{Before, Test}
 
 class BoardPrinterTest extends JUnitSuite {
   val board: Board = new Board(4, new Fleet(
-    Submarine(pos(1, 1), pos(3, 1)),
-    PatrolBoat(pos(2, 2), pos(2, 3))
+    new Ship(pos(1, 1), pos(3, 1)),
+    new Ship(pos(2, 2), pos(2, 3))
   ))
 
   @Before def shootABit(){

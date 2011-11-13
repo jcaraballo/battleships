@@ -5,12 +5,12 @@ import org.casa.battleships.Position.pos
 import org.scalatest.junit.JUnitSuite
 import org.casa.battleships.fleet._
 
-import org.casa.battleships.ascii.ShipPrinters.{createForUser, createForComputer}
+import org.casa.battleships.ascii.ShipPrinters.createForUser
 import org.casa.battleships.Position
 
 class ShipPrinterTest extends JUnitSuite {
   @Test def horizontal(){
-    val ship = new AircraftCarrier(pos(1, 1), pos(5, 1))
+    val ship = new Ship(pos(1, 1), pos(5, 1))
     expect('<'){createForUser.printShipSquareAt(ship, pos(1, 1))}
     expect('-'){createForUser.printShipSquareAt(ship, pos(2, 1))}
     expect('-'){createForUser.printShipSquareAt(ship, pos(3, 1))}
@@ -19,7 +19,7 @@ class ShipPrinterTest extends JUnitSuite {
   }
 
   @Test def vertical(){
-    val ship = new AircraftCarrier(pos(1, 1), pos(1, 5))
+    val ship = new Ship(pos(1, 1), pos(1, 5))
     expect('^'){createForUser.printShipSquareAt(ship, pos(1, 1))}
     expect('|'){createForUser.printShipSquareAt(ship, pos(1, 2))}
     expect('|'){createForUser.printShipSquareAt(ship, pos(1, 3))}

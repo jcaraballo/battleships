@@ -8,11 +8,11 @@ import org.casa.battleships.ShotOutcome._
 
 class FleetTest extends JUnitSuite {
   @Test def hasShips() {
-    val aircraftCarrier: AircraftCarrier = AircraftCarrier(pos(1, 1), pos(5, 1))
-    val battleship: Battleship = Battleship(pos(1, 2), pos(4, 2))
-    val destroyer: Destroyer = Destroyer(pos(1, 3), pos(3, 3))
-    val submarine: Submarine = Submarine(pos(1, 4), pos(3, 4))
-    val patrolBoat: PatrolBoat = PatrolBoat(pos(1, 5), pos(2, 5))
+    val aircraftCarrier = new Ship(pos(1, 1), pos(5, 1))
+    val battleship = new Ship(pos(1, 2), pos(4, 2))
+    val destroyer = new Ship(pos(1, 3), pos(3, 3))
+    val submarine = new Ship(pos(1, 4), pos(3, 4))
+    val patrolBoat = new Ship(pos(1, 5), pos(2, 5))
 
     expect(Set[Ship](aircraftCarrier, battleship, destroyer, submarine, patrolBoat)) {
       new Fleet(
@@ -27,7 +27,7 @@ class FleetTest extends JUnitSuite {
 
   @Test def shipsSharingSquareCannotFormAValidFleet() {
     try {
-      fleetIncluding(AircraftCarrier(pos(1, 1), pos(5, 1)), Battleship(pos(4, 1), pos(7, 1)))
+      fleetIncluding(new Ship(pos(1, 1), pos(5, 1)), new Ship(pos(4, 1), pos(7, 1)))
       fail()
     }
     catch {
@@ -36,7 +36,7 @@ class FleetTest extends JUnitSuite {
   }
 
   @Test def shipAtReturnsSomeShipWhenThereIsOneAtTheGivenPosition(){
-    val aircraftCarrier: AircraftCarrier = AircraftCarrier(pos(1, 1), pos(5, 1))
+    val aircraftCarrier = new Ship(pos(1, 1), pos(5, 1))
     expect(Some(aircraftCarrier)){
       fleetIncluding(aircraftCarrier).shipAt(pos(1,1))
     }
@@ -93,33 +93,17 @@ class FleetTest extends JUnitSuite {
     }
   }
 
-  private def fleetIncluding(aircraftCarrier: AircraftCarrier, battleship: Battleship): Fleet = {
-    val fleet: Fleet = new Fleet(
-      aircraftCarrier,
-      battleship,
-      Destroyer(pos(1, 3), pos(3, 3)),
-      Submarine(pos(1, 4), pos(3, 4)),
-      PatrolBoat(pos(1, 5), pos(2, 5))
-    )
-    fleet
-  }
-
-  private def fleetIncluding(aircraftCarrier: AircraftCarrier): Fleet = {
-    fleetIncluding(aircraftCarrier, Battleship(pos(1, 2), pos(4, 2)))
+  private def fleetIncluding(ships: Ship*): Fleet = {
+    new Fleet(ships.toSet + new Ship(pos(1, 3), pos(3, 3)) + new Ship(pos(1, 4), pos(3, 4)) + new Ship(pos(1, 5), pos(2, 5)))
   }
 
   private def fleetWithoutShipAtTenTen: Fleet = {
-    val aircraftCarrier: AircraftCarrier = AircraftCarrier(pos(1, 1), pos(5, 1))
-    val battleship: Battleship = Battleship(pos(1, 2), pos(4, 2))
-    val destroyer: Destroyer = Destroyer(pos(1, 3), pos(3, 3))
-    val submarine: Submarine = Submarine(pos(1, 4), pos(3, 4))
-    val patrolBoat: PatrolBoat = PatrolBoat(pos(1, 5), pos(2, 5))
     new Fleet(
-      aircraftCarrier,
-      battleship,
-      destroyer,
-      submarine,
-      patrolBoat
+      new Ship(pos(1, 1), pos(5, 1)),
+      new Ship(pos(1, 2), pos(4, 2)),
+      new Ship(pos(1, 3), pos(3, 3)),
+      new Ship(pos(1, 4), pos(3, 4)),
+      new Ship(pos(1, 5), pos(2, 5))
     )
   }
 }

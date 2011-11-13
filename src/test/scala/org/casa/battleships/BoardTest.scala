@@ -9,17 +9,13 @@ import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.is
 
 class BoardTest extends JUnitSuite {
-  val fleet: Fleet = new Fleet(
-    AircraftCarrier(pos(1, 1), pos(5, 1)),
-    Battleship(pos(1, 2), pos(4, 2)),
-    Destroyer(pos(1, 3), pos(3, 3)),
-    Submarine(pos(1, 4), pos(3, 4)),
-    PatrolBoat(pos(1, 5), pos(2, 5))
+  val someFleet: Fleet = new Fleet(
+    new Ship(pos(1, 1), pos(5, 1)),
+    new Ship(pos(1, 2), pos(4, 2)),
+    new Ship(pos(1, 3), pos(3, 3)),
+    new Ship(pos(1, 4), pos(3, 4)),
+    new Ship(pos(1, 5), pos(2, 5))
   )
-
-  @Test def createsFromFleet(){
-    new Board(10, fleet)
-  }
 
   @Test def shootDelegatesToFleetAndUpdatesShotPositions(){
     val position: Position = mock(classOf[Position])
@@ -36,7 +32,7 @@ class BoardTest extends JUnitSuite {
 
   @Test def shootableExcludesAlreadyShotSquares(){
     val all: Set[Position] = Positions.createGrid(10)
-    val b: Board = new Board(10, fleet)
+    val b: Board = new Board(10, someFleet)
     expect(all){b.shootable}
     b.shoot(pos(1, 1))
     expect(all-pos(1, 1)){b.shootable}
