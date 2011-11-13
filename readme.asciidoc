@@ -4,11 +4,11 @@ Joaquín Caraballo
 
 Instructions
 ------------
-. Start sbt (works with 0.10, probably also with sbt 0.11)
+. Start sbt (0.11.0)
 
 [source, scala]
 ------------
-$ sbt
+$ ./sbt
 ------------
 
 . Update to download dependencies (junit, scalatest and hamcrest apart from scala and sbt's)
