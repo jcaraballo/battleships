@@ -5,8 +5,8 @@ import org.junit.Test
 import org.mockito.Mockito._
 import org.mockito.Matchers._
 import org.casa.battleships.Position.pos
-import org.casa.battleships.strategy.positionchoice.{UpmostAndThenLeftmostPositionChooser, PositionChooser}
-import org.casa.battleships.{Positions, Position}
+import org.casa.battleships.strategy.positionchoice.PositionChooser
+import org.casa.battleships.Position
 
 class AimAtNextToHitShooterTest extends JUnitSuite {
   val delegate: Shooter = mock(classOf[Shooter])
