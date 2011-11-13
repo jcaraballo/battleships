@@ -16,9 +16,7 @@ class AimAtNextToHitShooter(chooser: PositionChooser)(delegate: Shooter) extends
           case _ => delegate.shoot(shootable, history)
         }
       }
-      case _ => {
-        delegate.shoot(shootable, history)
-      }
+      case _ => delegate.shoot(shootable, history)
     }
   }
 }
