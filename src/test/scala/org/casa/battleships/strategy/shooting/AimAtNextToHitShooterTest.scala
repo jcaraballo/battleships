@@ -6,7 +6,8 @@ import org.mockito.Mockito._
 import org.mockito.Matchers._
 import org.casa.battleships.Position.pos
 import org.casa.battleships.strategy.positionchoice.PositionChooser
-import org.casa.battleships.Position
+import org.casa.battleships.{ShotOutcome, Position}
+import org.casa.battleships.ShotOutcome._
 
 class AimAtNextToHitShooterTest extends JUnitSuite {
   val delegate: Shooter = mock(classOf[Shooter])
@@ -14,7 +15,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
 
   @Test def delegatesWhenThereIsNoPreviousShot() {
     val position: Position = pos(1, 1)
-    val emptyHistory: List[(Position, String)] = List[(Position, String)]()
+    val emptyHistory: List[(Position, ShotOutcome.Value)] = Nil
 
     when(delegate.shoot(Set(position), emptyHistory)).thenReturn(Some(position))
 
@@ -25,7 +26,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
 
   @Test def delegatesWhenLastNonWaterWasSunk() {
     val position: Position = pos(1, 1)
-    val history = (pos(3, 4), "water") :: (pos(4, 4), "sunk") :: Nil
+    val history = (pos(3, 4), Water) :: (pos(4, 4), Sunk) :: Nil
 
     when(delegate.shoot(Set(position), history)).thenReturn(Some(position))
 
@@ -36,7 +37,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
 
   @Test def delegatesWhenLastNonWaterWasHitButItsNeighboursAreNotShootable() {
     val position: Position = pos(1, 1)
-    val history = (pos(3, 4), "water") :: (pos(4, 4), "sunk") :: Nil
+    val history = (pos(3, 4), Water) :: (pos(4, 4), Sunk) :: Nil
 
     when(delegate.shoot(Set(position), history)).thenReturn(Some(position))
     when(chooser.choose(isA(classOf[Set[Position]]))).thenReturn(None)
@@ -48,7 +49,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
 
   @Test def picksOneOfTheLastNonWaterWhenThatWasHitAndShootable() {
     val position: Position = pos(1, 1)
-    val history = (pos(3, 4), "water") :: (pos(4, 4), "hit") :: Nil
+    val history = (pos(3, 4), Water) :: (pos(4, 4), Hit) :: Nil
 
     when(chooser.choose(isA(classOf[Set[Position]]))).thenReturn(Some(position))
 

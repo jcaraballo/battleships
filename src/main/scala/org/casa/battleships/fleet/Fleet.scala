@@ -1,7 +1,8 @@
 package org.casa.battleships.fleet
 
 import scala.collection.mutable
-import org.casa.battleships.Position
+import org.casa.battleships.ShotOutcome._
+import org.casa.battleships.{ShotOutcome, Position}
 
 case class Fleet (ships: Set[Ship]) {
   def this(ships: Ship*) = this(ships.toSet)
@@ -23,13 +24,13 @@ case class Fleet (ships: Set[Ship]) {
 
   def shipAt(position: Position): Option[Ship] = ships.find(_.squares.contains(position))
 
-  def shootAt(position: Position): (Fleet, String) = {
+  def shootAt(position: Position): (Fleet, ShotOutcome.Value) = {
     val affectedShip: Option[Ship] = shipAt(position)
     affectedShip match {
-      case None => (this, "water")
+      case None => (this, Water)
       case Some(ship) => {
         val affectedShip: Ship = ship.shootAt(position)
-        (new Fleet(ships - ship + affectedShip), if (affectedShip.isSunk) "sunk" else "hit")
+        (new Fleet(ships - ship + affectedShip), if (affectedShip.isSunk) Sunk else Hit)
       }
     }
   }

@@ -1,13 +1,14 @@
 package org.casa.battleships.strategy.shooting
 
-import org.casa.battleships.Position
 import org.casa.battleships.Positions.neighbours
 import org.casa.battleships.strategy.positionchoice.PositionChooser
 import annotation.tailrec
+import org.casa.battleships.{ShotOutcome, Position}
+import org.casa.battleships.ShotOutcome._
 
 class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
-  def interestingHits(allHistory: List[(Position, String)]): List[Position] = {
-    allHistory.takeWhile(_._2!="sunk").filter(_._2=="hit").map(_._1)
+  def interestingHits(allHistory: List[(Position, ShotOutcome.Value)]): List[Position] = {
+    allHistory.takeWhile(_._2!=Sunk).filter(_._2==Hit).map(_._1)
   }
 
   def haveElementsInCommon[T](s1: Set[T], s2: Set[T]): Boolean = {
@@ -70,7 +71,7 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
     }
   }
 
-  def shoot(shootable: Set[Position], history: List[(Position, String)]) = {
+  def shoot(shootable: Set[Position], history: List[(Position, ShotOutcome.Value)]) = {
     val hits: List[Position] = interestingHits(history)
     val found: Option[Position] = findLine(shootable, hits)
     found.orElse(delegate.shoot(shootable, history))

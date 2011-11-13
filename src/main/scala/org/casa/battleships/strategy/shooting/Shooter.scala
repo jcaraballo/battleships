@@ -1,7 +1,7 @@
 package org.casa.battleships.strategy.shooting
 
-import org.casa.battleships.Position
+import org.casa.battleships.{ShotOutcome, Position}
 
 abstract class Shooter {
-  def shoot(shootable: Set[Position], history: List[(Position, String)]): Option[Position]
+  def shoot(shootable: Set[Position], history: List[(Position, ShotOutcome.Value)]): Option[Position]
 }

@@ -3,7 +3,8 @@ package org.casa.battleships.fleet
 import org.junit.Test
 import org.casa.battleships.Position.pos
 import org.scalatest.junit.JUnitSuite
-import org.casa.battleships.{Board, Position}
+import org.casa.battleships.Position
+import org.casa.battleships.ShotOutcome._
 
 class FleetTest extends JUnitSuite {
   @Test def hasShips() {
@@ -48,7 +49,7 @@ class FleetTest extends JUnitSuite {
   }
 
   @Test def shootAtReturnsItselfPlusWaterIfThereIsNoShipInSuchPosition(){
-    expect((fleetWithoutShipAtTenTen, "water")){
+    expect((fleetWithoutShipAtTenTen, Water)){
       fleetWithoutShipAtTenTen.shootAt(pos(10, 10))
     }
   }
@@ -57,7 +58,7 @@ class FleetTest extends JUnitSuite {
     val newShip = new Ship(Set(pos(1, 1), pos(2, 1), pos(3, 1)), Set[Position]())
     val fleet: Fleet = new Fleet(Set(newShip))
 
-    expect((new Fleet(Set(newShip.shootAt(pos(1, 1)))), "hit")) {
+    expect((new Fleet(Set(newShip.shootAt(pos(1, 1)))), Hit)) {
       fleet.shootAt(pos(1, 1))
     }
   }
@@ -68,7 +69,7 @@ class FleetTest extends JUnitSuite {
 
     val sunkShip: Ship = dodgyShip.shootAt(pos(3, 1))
 
-    expect((new Fleet(Set(sunkShip)), "sunk")) {
+    expect((new Fleet(Set(sunkShip)), Sunk)) {
       fleet.shootAt(pos(3, 1))
     }
   }

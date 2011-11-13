@@ -32,8 +32,8 @@ Enter your move:
 """){start}
 
     expect("""
-User: (1, 1) => hit
-Computer: (1, 1) => hit
+User: (1, 1) => Hit
+Computer: (1, 1) => Hit
 
 Comp   You
 ___________  ___________
@@ -54,8 +54,8 @@ Enter your move:
 """){shoot(1, 1)}
 
     expect("""
-User: (2, 1) => hit
-Computer: (1, 1) => hit
+User: (2, 1) => Hit
+Computer: (1, 1) => Hit
 
 Comp   You
 ___________  ___________
@@ -79,8 +79,8 @@ Enter your move:
     shoot(4, 1)
 
     expect("""
-User: (5, 1) => sunk
-Computer: (1, 1) => hit
+User: (5, 1) => Sunk
+Computer: (1, 1) => Hit
 
 Comp   You
 ___________  ___________
@@ -101,8 +101,8 @@ Enter your move:
 """){shoot(5, 1)}
 
     expect("""
-User: (10, 10) => water
-Computer: (1, 1) => hit
+User: (10, 10) => Water
+Computer: (1, 1) => Hit
 
 Comp   You
 ___________  ___________
@@ -146,8 +146,8 @@ Enter your move:
 """){start}
 
     expect("""
-User: (2, 2) => water
-Computer: (1, 1) => hit
+User: (2, 2) => Water
+Computer: (1, 1) => Hit
 
 Comp   You
 _____  _____
@@ -162,8 +162,8 @@ Enter your move:
 """){shoot(2, 2)}
 
     expect("""
-User: (4, 2) => hit
-Computer: (1, 1) => hit
+User: (4, 2) => Hit
+Computer: (1, 1) => Hit
 
 Comp   You
 _____  _____
@@ -182,8 +182,8 @@ Enter your move:
     shoot(2, 1)
 
     expect("""
-User: (1, 1) => sunk
-Computer: (1, 1) => hit
+User: (1, 1) => Sunk
+Computer: (1, 1) => Hit
 
 Comp   You
 _____  _____

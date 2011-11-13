@@ -23,7 +23,7 @@ class BoardTest extends JUnitSuite {
 
   @Test def shootDelegatesToFleetAndUpdatesShotPositions(){
     val position: Position = mock(classOf[Position])
-    val outcome: String = "some outcome"
+    val outcome: ShotOutcome.Value = ShotOutcome.Hit
     val fleet: Fleet = mock(classOf[Fleet])
     val updatedFleet: Fleet = mock(classOf[Fleet])
 

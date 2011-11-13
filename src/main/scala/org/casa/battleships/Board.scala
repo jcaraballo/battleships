@@ -6,8 +6,8 @@ import org.casa.battleships.fleet.Fleet
 final class Board private (val size: Int, var fleet: Fleet, var shotPositions: Set[Position]) {
   def this(size: Int, fleet: Fleet) = this(size, fleet, Set[Position]())
 
-  def shoot(position: Position): String = {
-    val (newFleet, outcome): (Fleet, String) = fleet.shootAt(position)
+  def shoot(position: Position): ShotOutcome.Value = {
+    val (newFleet, outcome): (Fleet, ShotOutcome.Value) = fleet.shootAt(position)
     fleet = newFleet
     shotPositions += position
     outcome

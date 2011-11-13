@@ -16,7 +16,7 @@ object Game {
   val randomShooter = new RandomShooter
   val deterministicShooter = new OneOneShooter
 
-  var historyOfComputerShotsAtUser: List[(Position, String)] = List[(Position, String)]()
+  var historyOfComputerShotsAtUser: List[(Position, ShotOutcome.Value)] = Nil
 
   reset
 
@@ -76,15 +76,15 @@ object Game {
       settings.computerShooter.shoot(shootable, historyOfComputerShotsAtUser).get
     }
 
-    def saveHistory(position: Position, outcome: String){
+    def saveHistory(position: Position, outcome: ShotOutcome.Value){
       historyOfComputerShotsAtUser = (position, outcome) :: historyOfComputerShotsAtUser
     }
 
     val positionWhereUserShootsComputer: Position = pos(column, row)
-    val userShootsComputerOutcome: String = dashboard.computerBoard.shoot(positionWhereUserShootsComputer)
+    val userShootsComputerOutcome: ShotOutcome.Value = dashboard.computerBoard.shoot(positionWhereUserShootsComputer)
 
     val positionWhereComputerShootsUser: Position = computerShootsUser(dashboard.userBoard.shootable)
-    val computerShootsUserOutcome: String = dashboard.userBoard.shoot(positionWhereComputerShootsUser)
+    val computerShootsUserOutcome: ShotOutcome.Value = dashboard.userBoard.shoot(positionWhereComputerShootsUser)
 
     saveHistory(positionWhereComputerShootsUser, computerShootsUserOutcome)
 
