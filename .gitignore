@@ -10,7 +10,6 @@ project/boot/
 project/plugins/project/
 
 #IntelliJ
-.idea/workspace.xml
-.idea/dictionaries/
-.idea/highlighting.xml
+.idea/
+.idea_modules/
 
