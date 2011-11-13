@@ -15,54 +15,45 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
     !((s1 & s2).isEmpty)
   }
 
-  def findLinePassingByCenter(shootable: Set[Position], hits: List[Position], center: Position): Option[Position] = {
-    def tryWith(ps: List[Position]): Option[Position] = chooser.choose(ps.toSet & shootable)
+  @tailrec
+  final def endOfLine(center: Position, hits: Set[Position], direction: Position => Position): Position = {
+    val next: Position = direction(center)
+    if(hits.contains(next)){
+      endOfLine(next, hits, direction)
+    }else{
+      next
+    }
+  }
 
+  def findLinePassingByCenter(shootable: Set[Position], hits: Set[Position], center: Position): Option[Position] = {
     val up: Boolean = hits.contains(center.up)
     val left: Boolean = hits.contains(center.left)
     val right: Boolean = hits.contains(center.right)
     val down: Boolean = hits.contains(center.down)
-    val neighbourhood = (up, left, true, right, down)
 
     val X = true
     val o = false
 
-    neighbourhood match {
-      case (_,
-         X, X, X,
-            _)    => tryWith(center.left.left :: center.right.right :: Nil)
-
-      case (X,
-         _, X, _,
-            X)    => tryWith(center.up.up :: center.down.down :: Nil)
-
-      case (_,
-         X, X, o,
-            _)    => tryWith(center.left.left :: center.right :: Nil)
-
-      case (_,
-         o, X, X,
-            _)    => tryWith(center.left :: center.right.right :: Nil)
-
-      case (X,
-         _, X, _,
-            o)    => tryWith(center.up.up :: center.down :: Nil)
-
-      case (o,
-         _, X, _,
-            X)    => tryWith(center.up :: center.down.down :: Nil)
-      case _ => None
-    }
+    val continuations: Set[Position] = (
+      if (Set((X, X, X), (o, X, X), (X, X, o)).contains((left, X, right))) {
+        Set(endOfLine(center, hits, _.left), endOfLine(center, hits, _.right))
+      } else {
+        Set[Position]()
+      }) ++
+      (if (Set((X, X, X), (o, X, X), (X, X, o)).contains((up, X, down))) {
+        Set(endOfLine(center, hits, _.up), endOfLine(center, hits, _.down))
+      } else {
+        Set[Position]()
+      })
+    chooser.choose(continuations & shootable)
   }
 
   @tailrec
   final private def findLine(shootable: Set[Position], hits: List[Position]): Option[Position] = {
-
     hits match {
       case head :: rest => {
-        val otherHits: Set[Position] = rest.toSet
-        if (haveElementsInCommon(neighbours(head), otherHits)) {
-          findLinePassingByCenter(shootable, hits, head)
+        if (haveElementsInCommon(neighbours(head), rest.toSet)) {
+          findLinePassingByCenter(shootable, hits.toSet, head)
         } else {
           findLine(shootable, rest)
         }
@@ -73,7 +64,6 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
 
   def shoot(shootable: Set[Position], history: List[(Position, ShotOutcome.Value)]) = {
     val hits: List[Position] = interestingHits(history)
-    val found: Option[Position] = findLine(shootable, hits)
-    found.orElse(delegate.shoot(shootable, history))
+    findLine(shootable, hits).orElse(delegate.shoot(shootable, history))
   }
 }
