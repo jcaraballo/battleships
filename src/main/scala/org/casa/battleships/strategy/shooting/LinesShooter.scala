@@ -55,7 +55,7 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
   }
 
   @tailrec
-  final def findLine(shootable: Set[Position], hits: List[Position]): Option[Position] = {
+  final private def findLine(shootable: Set[Position], hits: List[Position]): Option[Position] = {
 
     hits match {
       case head :: rest => {
