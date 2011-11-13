@@ -8,7 +8,7 @@ Instructions
 
     $ ./sbt
 
-. Update to download dependencies (junit, scalatest and hamcrest apart from scala and sbt's)
+* Update to download dependencies (junit, scalatest and hamcrest apart from scala and sbt's)
 
     update
 
