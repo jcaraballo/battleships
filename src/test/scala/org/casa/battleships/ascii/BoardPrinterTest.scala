@@ -20,27 +20,29 @@ class BoardPrinterTest extends JUnitSuite {
 
   @Test def userBoard() {
     expect(List(
-        "_____",
-        " 1234",
-        "1<*>·",
-        "2·*··",
-        "3·v··",
-        "4····",
-        "_____"
-      )){
-      BoardPrinters.createForUser.toAsciiStrings(board)
+    "  1 2 3 4  ",
+    "  ~~~~~~~  ",
+    "1{< * >  }1",
+    "2{  *    }2",
+    "3{  v    }3",
+    "4{       }4",
+    "  ~~~~~~~  ",
+    "  1 2 3 4  "
+      ).mkString("\n")){
+      BoardPrinters.createForUser.toAsciiStrings(board).mkString("\n")
     }
   }
 
   @Test def computerBoard() {
     expect(List(
-        "_____",
-        " 1234",
-        "1 *  ",
-        "2 *  ",
-        "3    ",
-        "4    ",
-        "_____"
+      "  1 2 3 4  ",
+      "  ~~~~~~~  ",
+      "1{  *    }1",
+      "2{  *    }2",
+      "3{       }3",
+      "4{       }4",
+      "  ~~~~~~~  ",
+      "  1 2 3 4  "
       )){
       BoardPrinters.createForComputer.toAsciiStrings(board)
     }

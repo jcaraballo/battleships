@@ -5,28 +5,30 @@ import org.casa.battleships.Position.pos
 import collection.mutable.ListBuffer
 
 class BoardPrinter(val shipPrinter: ShipPrinter)(val water: Char, val shotWater: Char) {
-  def frame(board: Board) = "_" * (board.size + 1)
-  def topAxis(board: Board) = " " + (1 to board.size).map(_.toString.last).mkString
+  def horizontalAxis(board: Board) = "  " + (1 to board.size).map(_.toString.last).mkString(" ") + "  "
+  def frame(board: Board) = "  " + ("~" * (board.size * 2 - 1)) + "  "
 
   def toAsciiStrings(board: Board): List[String] = {
+
+    def squareToAscii(position: Position): Char = {
+      (board.fleet.shipAt(position) match {
+        case Some(ship) => shipPrinter.printShipSquareAt(ship, position)
+        case None => if (board.shotPositions.contains(position)) shotWater else water
+      })
+    }
+
     val strings = new ListBuffer[String]
+    strings += horizontalAxis(board)
     strings += frame(board)
-    strings += topAxis(board)
 
     for (row <- 1 to board.size) {
-      val stringBuilder: StringBuilder = new StringBuilder()
-      stringBuilder += row.toString.last
-      for (column <- 1 to board.size) {
-        val position: Position = pos(column, row)
-        stringBuilder += (board.fleet.shipAt(position) match {
-          case Some(ship) => shipPrinter.printShipSquareAt(ship, position)
-          case None => if (board.shotPositions.contains(position)) shotWater else water
-        })
-      }
-      strings += stringBuilder.toString()
+      strings += row.toString.last + "{" +
+          (1 to board.size).map(column => squareToAscii(pos(column, row))).mkString(" ") +
+          "}" + row.toString.last
     }
 
     strings += frame(board)
+    strings += horizontalAxis(board)
     strings.toList
   }
 

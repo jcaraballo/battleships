@@ -3,7 +3,7 @@ package org.casa.battleships
 import ascii.BoardPrinters
 import org.casa.battleships.fleet.Fleet
 
-final class Board private (val size: Int, var fleet: Fleet, var shotPositions: Set[Position]) {
+final class Board (val size: Int, var fleet: Fleet, var shotPositions: Set[Position]) {
   def this(size: Int, fleet: Fleet) = this(size, fleet, Set[Position]())
 
   def shoot(position: Position): ShotOutcome.Value = {
