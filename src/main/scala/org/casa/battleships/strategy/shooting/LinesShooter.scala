@@ -26,22 +26,14 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
   }
 
   def findPossibleEndsOfLinePassingByCenter(hits: Set[Position], center: Position): Set[Position] = {
-    val up: Boolean = hits.contains(center.up)
-    val left: Boolean = hits.contains(center.left)
-    val right: Boolean = hits.contains(center.right)
-    val down: Boolean = hits.contains(center.down)
-
-    val X = true
-    val o = false
-
     (
-      if (Set((X, X, X), (o, X, X), (X, X, o)).contains((left, X, right))) {
+      if (hits.contains(center.left) || hits.contains(center.right)) {
         Set(endOfLine(center, hits, _.left), endOfLine(center, hits, _.right))
       } else {
         Set[Position]()
       }
     ) ++ (
-      if (Set((X, X, X), (o, X, X), (X, X, o)).contains((up, X, down))) {
+      if (hits.contains(center.up) || hits.contains(center.down)) {
         Set(endOfLine(center, hits, _.up), endOfLine(center, hits, _.down))
       } else {
         Set[Position]()
