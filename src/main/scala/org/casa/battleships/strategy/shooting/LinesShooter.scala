@@ -25,7 +25,7 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
     }
   }
 
-  def findLinePassingByCenter(shootable: Set[Position], hits: Set[Position], center: Position): Option[Position] = {
+  def findPossibleEndsOfLinePassingByCenter(hits: Set[Position], center: Position): Set[Position] = {
     val up: Boolean = hits.contains(center.up)
     val left: Boolean = hits.contains(center.left)
     val right: Boolean = hits.contains(center.right)
@@ -34,18 +34,19 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
     val X = true
     val o = false
 
-    val continuations: Set[Position] = (
+    (
       if (Set((X, X, X), (o, X, X), (X, X, o)).contains((left, X, right))) {
         Set(endOfLine(center, hits, _.left), endOfLine(center, hits, _.right))
       } else {
         Set[Position]()
-      }) ++
-      (if (Set((X, X, X), (o, X, X), (X, X, o)).contains((up, X, down))) {
+      }
+    ) ++ (
+      if (Set((X, X, X), (o, X, X), (X, X, o)).contains((up, X, down))) {
         Set(endOfLine(center, hits, _.up), endOfLine(center, hits, _.down))
       } else {
         Set[Position]()
-      })
-    chooser.choose(continuations & shootable)
+      }
+    )
   }
 
   @tailrec
@@ -53,7 +54,8 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
     hits match {
       case head :: rest => {
         if (haveElementsInCommon(neighbours(head), rest.toSet)) {
-          findLinePassingByCenter(shootable, hits.toSet, head)
+          val continuations: Set[Position] = findPossibleEndsOfLinePassingByCenter(hits.toSet, head)
+          chooser.choose(continuations & shootable)
         } else {
           findLine(shootable, rest)
         }

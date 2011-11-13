@@ -35,23 +35,16 @@ class LinesShooterTest extends JUnitSuite {
   
   @Test def shootsAtContinuationOfLineEvenFurtherThanImmediateNeighbours(){
     val hits = Set(pos(2, 2), pos(3, 2), pos(4, 2), pos(5, 2), pos(6, 2))
-    val shootable = createGrid(10) -- hits
 
-    when(chooser.choose(Set(pos(1, 2), pos(7, 2)))).thenReturn(Some(pos(1, 2)))
-
-    val chosenTarget = new LinesShooter(chooser)(delegate).findLinePassingByCenter(shootable, hits, pos(4, 2))
-    assertThat(chosenTarget, is[Option[Position]](Some(pos(1, 2))))
+    val selectedTargets: Set[Position] = new LinesShooter(chooser)(delegate).findPossibleEndsOfLinePassingByCenter(hits, pos(4, 2))
+    assertThat(selectedTargets, is(Set(pos(1, 2), pos(7, 2))))
   }
 
   @Test def considersBothHorizontalAndVerticalContinuationsWhenBothAreApplicable(){
     val hits = Set(pos(3, 2),
         pos(2, 3), pos(3, 3), pos(4, 3),
                    pos(3, 4))
-    val shootable = createGrid(10) -- hits
-
-    when(chooser.choose(Set(pos(3, 1), pos(1, 3), pos(5, 3), pos(3, 5)))).thenReturn(Some(pos(3, 1)))
-
-    val chosenTarget = new LinesShooter(chooser)(delegate).findLinePassingByCenter(shootable, hits, pos(3, 3))
-    assertThat(chosenTarget, is[Option[Position]](Some(pos(3, 1))))
+    val chosenTarget = new LinesShooter(chooser)(delegate).findPossibleEndsOfLinePassingByCenter(hits, pos(3, 3))
+    assertThat(chosenTarget, is(Set(pos(3, 1), pos(1, 3), pos(5, 3), pos(3, 5))))
   }
 }
