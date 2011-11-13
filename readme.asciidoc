@@ -4,7 +4,7 @@ Joaquín Caraballo
 
 Instructions
 ------------
-* Start sbt (0.11.0)
+* Start sbt (0.11.0). Your might have to clean ~/.sbt/ if you have used gen-idea with an earlier version of sbt before
 
     $ ./sbt
 
