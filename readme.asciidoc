@@ -1,0 +1,70 @@
+Battleships
+==========
+Joaquín Caraballo
+
+Instructions
+------------
+. Start sbt (works with 0.10, probably also with sbt 0.11)
+
+[source, scala]
+------------
+$ sbt
+------------
+
+. Update to download dependencies (junit, scalatest and hamcrest apart from scala and sbt's)
+
+[source, scala]
+------------
+> update
+------------
+
+. Start the console
+
+[source, scala]
+------------
+> console
+------------
+
+. Import DSL
+
+[source, scala]
+------------
+scala> import org.casa.battleships.Game._
+------------
+
+. Start the game
+
+[source, scala]
+------------
+scala> start
+------------
+
+. The user shoots with
+[source, scala]
+------------
+scala> shoot(3, 4)
+------------
+
+
+Additionally
+------------
+
+* The game can be restarted at any point with
+[source, scala]
+scala> start
+
+* There is a quick mode, handy for (automated or exploratory) testing, with a 4x4 grid and only a couple of ships. To configure the game in quick mode:
+
+[source, scala]
+scala> configure using quickMode
+
+* The configuration can be reset with
+
+[source, scala]
+-------
+scala> reset
+-------
+
+For other options (deterministic algorithms, etc) see GameTest.scala and Game.scala itself.
+
+
