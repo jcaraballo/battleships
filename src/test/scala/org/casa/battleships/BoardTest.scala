@@ -17,7 +17,7 @@ class BoardTest extends JUnitSuite {
     new Ship(pos(1, 5), pos(2, 5))
   )
 
-  @Test def shootDelegatesToFleetAndUpdatesShotPositions(){
+  @Test def shootDelegatesToFleetAndUpdatesShotPositions() {
     val position: Position = mock(classOf[Position])
     val outcome: ShotOutcome.Value = ShotOutcome.Hit
     val fleet: Fleet = mock(classOf[Fleet])
@@ -30,29 +30,28 @@ class BoardTest extends JUnitSuite {
     assertThat(board.shotPositions, is(Set(position)))
   }
 
-  @Test def shootableExcludesAlreadyShotSquares(){
+  @Test def shootableExcludesAlreadyShotSquares() {
     val all: Set[Position] = Positions.createGrid(10)
-    val b: Board = new Board(10, someFleet)
-    expect(all){b.shootable}
-    b.shoot(pos(1, 1))
-    expect(all-pos(1, 1)){b.shootable}
-    b.shoot(pos(2, 1))
-    expect(all-pos(1, 1)-pos(2, 1)){b.shootable}
+
+    val board: Board = new Board(10, someFleet)
+    assertThat(board.shootable, is(all))
+
+    board.shoot(pos(1, 1))
+    assertThat(board.shootable, is(all - pos(1, 1)))
+
+    board.shoot(pos(2, 1))
+    assertThat(board.shootable, is(all - pos(1, 1) - pos(2, 1)))
   }
 
   @Test def areAllShipsSunkDelegatesToFleet() {
     val sunkFleet: Fleet = new Fleet() {
       override def isSunk = true
     }
-    expect(true) {
-      new Board(4, sunkFleet).areAllShipsSunk
-    }
+    assertThat(new Board(4, sunkFleet).areAllShipsSunk, is(true))
 
     val perfectFleet: Fleet = new Fleet() {
       override def isSunk = false
     }
-    expect(false) {
-      new Board(4, perfectFleet).areAllShipsSunk
-    }
+    assertThat(new Board(4, perfectFleet).areAllShipsSunk, is(false))
   }
 }
