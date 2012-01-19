@@ -29,7 +29,7 @@ object Game {
                       var positionChooser: PositionChooser,
                       var computerShooter: Shooter){
     def this() = this(10, 5::4::3::3::2::Nil, randomChooser,
-      new LinesShooter(randomChooser)(new AimAtNextToHitShooter(randomChooser)(randomShooter)))
+      new LinesShooter(randomChooser)(new MultipleShooter(new AimAtNextToHitShooter(randomChooser), randomShooter)))
 
     def createComputerBoard: Board = {
       new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes).get)

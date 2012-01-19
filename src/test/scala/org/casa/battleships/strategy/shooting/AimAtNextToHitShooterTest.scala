@@ -13,37 +13,32 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
   val delegate: Shooter = mock(classOf[Shooter])
   val chooser: PositionChooser = mock(classOf[PositionChooser])
 
-  @Test def delegatesWhenThereIsNoPreviousShot() {
+  @Test def failsWhenThereIsNoPreviousShot() {
     val position: Position = pos(1, 1)
     val emptyHistory: List[(Position, ShotOutcome.Value)] = Nil
 
-    when(delegate.shoot(Set(position), emptyHistory)).thenReturn(Some(position))
-
-    expect(Some(position)) {
-      new AimAtNextToHitShooter(chooser)(delegate).shoot(Set(position), emptyHistory)
+    expect(None) {
+      new AimAtNextToHitShooter(chooser).shoot(Set(position), emptyHistory)
     }
   }
 
-  @Test def delegatesWhenLastNonWaterWasSunk() {
+  @Test def failsWhenLastNonWaterWasSunk() {
     val position: Position = pos(1, 1)
     val history = (pos(3, 4), Water) :: (pos(4, 4), Sunk) :: Nil
 
-    when(delegate.shoot(Set(position), history)).thenReturn(Some(position))
-
-    expect(Some(position)) {
-      new AimAtNextToHitShooter(chooser)(delegate).shoot(Set(position), history)
+    expect(None) {
+      new AimAtNextToHitShooter(chooser).shoot(Set(position), history)
     }
   }
 
-  @Test def delegatesWhenLastNonWaterWasHitButItsNeighboursAreNotShootable() {
+  @Test def failsWhenLastNonWaterWasHitButItsNeighboursAreNotShootable() {
     val position: Position = pos(1, 1)
     val history = (pos(3, 4), Water) :: (pos(4, 4), Sunk) :: Nil
 
-    when(delegate.shoot(Set(position), history)).thenReturn(Some(position))
     when(chooser.choose(isA(classOf[Set[Position]]))).thenReturn(None)
 
-    expect(Some(position)) {
-      new AimAtNextToHitShooter(chooser)(delegate).shoot(Set(position), history)
+    expect(None) {
+      new AimAtNextToHitShooter(chooser).shoot(Set(position), history)
     }
   }
 
@@ -54,9 +49,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
     when(chooser.choose(isA(classOf[Set[Position]]))).thenReturn(Some(position))
 
     expect(Some(position)) {
-      new AimAtNextToHitShooter(chooser)(delegate).shoot(Set(position), history)
+      new AimAtNextToHitShooter(chooser).shoot(Set(position), history)
     }
-
-    verifyZeroInteractions(delegate)
   }
 }
