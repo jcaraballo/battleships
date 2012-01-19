@@ -8,10 +8,10 @@ import org.casa.battleships.Position.pos
 import org.casa.battleships.{ShotOutcome, Position}
 import org.casa.battleships.ShotOutcome.Water
 import org.junit.Assert.assertThat
+import org.hamcrest.Matcher
 import org.hamcrest.CoreMatchers.is
-import org.hamcrest.{Matcher, CoreMatchers}
 
-class MultipleShooterTest extends FunSuite {
+class SequentialShooterTest extends FunSuite {
 
   val shootable: Set[Position] = Set[Position](pos(1, 1))
   val history: List[(Position, ShotOutcome.Value)] = (pos(2, 1), Water) :: (pos(1, 2), Water) :: (pos(2, 2), Water) :: Nil
@@ -40,11 +40,11 @@ class MultipleShooterTest extends FunSuite {
   }
 
   def isNone: Matcher[Option[Position]] = {
-    CoreMatchers.is[Option[Position]](None)
+    is[Option[Position]](None)
   }
   
   test("fail when all shooters fail"){
-    val multipleShooter: MultipleShooter = new MultipleShooter(failingShooter, failingShooter, failingShooter)
+    val multipleShooter: SequentialShooter = new SequentialShooter(failingShooter, failingShooter, failingShooter)
     assertThat(multipleShooter.shoot(shootable, history), isNone)
   }
   
@@ -54,7 +54,7 @@ class MultipleShooterTest extends FunSuite {
     val shooter3 = shooterThatShootsAt(somePosition)
     val shooter4 = mock(classOf[Shooter])
 
-    new MultipleShooter(shooter1, shooter2, shooter3, shooter4).shoot(shootable, history)
+    new SequentialShooter(shooter1, shooter2, shooter3, shooter4).shoot(shootable, history)
 
     val sequentially: InOrder = inOrder(shooter1, shooter2, shooter3)
     sequentially.verify(shooter1).shoot(anyShootable, anyHistory)
@@ -64,7 +64,7 @@ class MultipleShooterTest extends FunSuite {
   }
   
   test("returns what the first succeeding shooter returns"){
-    val multipleShooter = new MultipleShooter(failingShooter, failingShooter, shooterThatShootsAt(somePosition), shooterThatShootsAt(anotherPosition))
-    assertThat(multipleShooter.shoot(shootable, history), CoreMatchers.is[Option[Position]](somePosition))
+    val multipleShooter = new SequentialShooter(failingShooter, failingShooter, shooterThatShootsAt(somePosition), shooterThatShootsAt(anotherPosition))
+    assertThat(multipleShooter.shoot(shootable, history), is[Option[Position]](somePosition))
   }
 }

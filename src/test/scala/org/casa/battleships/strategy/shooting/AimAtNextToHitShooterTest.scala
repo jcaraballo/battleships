@@ -10,7 +10,6 @@ import org.casa.battleships.{ShotOutcome, Position}
 import org.casa.battleships.ShotOutcome._
 
 class AimAtNextToHitShooterTest extends JUnitSuite {
-  val delegate: Shooter = mock(classOf[Shooter])
   val chooser: PositionChooser = mock(classOf[PositionChooser])
 
   @Test def failsWhenThereIsNoPreviousShot() {

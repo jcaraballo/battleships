@@ -29,7 +29,7 @@ object Game {
                       var positionChooser: PositionChooser,
                       var computerShooter: Shooter){
     def this() = this(10, 5::4::3::3::2::Nil, randomChooser,
-      new MultipleShooter(
+      new SequentialShooter(
         new LinesShooter(randomChooser),
         new AimAtNextToHitShooter(randomChooser),
         randomShooter)
