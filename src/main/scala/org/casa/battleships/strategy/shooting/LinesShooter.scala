@@ -6,7 +6,7 @@ import annotation.tailrec
 import org.casa.battleships.{ShotOutcome, Position}
 import org.casa.battleships.ShotOutcome._
 
-class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
+class LinesShooter(chooser: PositionChooser) extends Shooter{
   def interestingHits(allHistory: List[(Position, ShotOutcome.Value)]): List[Position] = {
     allHistory.takeWhile(_._2!=Sunk).filter(_._2==Hit).map(_._1)
   }
@@ -58,6 +58,6 @@ class LinesShooter(chooser: PositionChooser)(delegate: Shooter) extends Shooter{
 
   def shoot(shootable: Set[Position], history: List[(Position, ShotOutcome.Value)]) = {
     val hits: List[Position] = interestingHits(history)
-    findLine(shootable, hits).orElse(delegate.shoot(shootable, history))
+    findLine(shootable, hits)
   }
 }
