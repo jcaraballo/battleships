@@ -1,15 +1,14 @@
 package org.casa.battleships.ascii
 
-import org.junit.Test
 import org.casa.battleships.Position.pos
-import org.scalatest.junit.JUnitSuite
 import org.casa.battleships.fleet._
 
 import org.casa.battleships.ascii.ShipPrinters.createForUser
 import org.casa.battleships.Position
+import org.scalatest.FunSuite
 
-class ShipPrinterTest extends JUnitSuite {
-  @Test def horizontal(){
+class ShipPrinterTest extends FunSuite {
+  test("horizontal"){
     val ship = new Ship(pos(1, 1), pos(5, 1))
     expect('<'){createForUser.printShipSquareAt(ship, pos(1, 1))}
     expect('-'){createForUser.printShipSquareAt(ship, pos(2, 1))}
@@ -18,7 +17,7 @@ class ShipPrinterTest extends JUnitSuite {
     expect('>'){createForUser.printShipSquareAt(ship, pos(5, 1))}
   }
 
-  @Test def vertical(){
+  test("vertical"){
     val ship = new Ship(pos(1, 1), pos(1, 5))
     expect('^'){createForUser.printShipSquareAt(ship, pos(1, 1))}
     expect('|'){createForUser.printShipSquareAt(ship, pos(1, 2))}
@@ -27,14 +26,14 @@ class ShipPrinterTest extends JUnitSuite {
     expect('v'){createForUser.printShipSquareAt(ship, pos(1, 5))}
   }
 
-  @Test def horizontalHit(){
+  test("horizontal hit"){
     val squares: Set[Position] = Set(pos(1, 1), pos(2, 1))
     val smashedShip = new Ship(squares, squares)
     expect('*'){createForUser.printShipSquareAt(smashedShip, pos(1, 1))}
     expect('*'){createForUser.printShipSquareAt(smashedShip, pos(2, 1))}
   }
 
-  @Test def verticalHit(){
+  test("vertical hit"){
     val squares: Set[Position] = Set(pos(1, 1), pos(1, 2))
     val smashedShip = new Ship(squares, squares)
     expect('*'){createForUser.printShipSquareAt(smashedShip, pos(1, 1))}
