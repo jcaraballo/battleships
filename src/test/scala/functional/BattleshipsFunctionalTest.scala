@@ -4,7 +4,7 @@ import org.junit.Test
 import org.scalatest.junit.JUnitSuite
 import org.casa.battleships.Battleships._
 
-class BattleshipsTest extends JUnitSuite {
+class BattleshipsFunctionalTest extends JUnitSuite {
   @Test def plays() {
     reset
     configure using deterministicChooser

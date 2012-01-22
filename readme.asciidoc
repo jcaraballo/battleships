@@ -44,4 +44,4 @@ Additionally
 
     scala> reset
 
-For other options (deterministic algorithms, etc) see BattleshipsTest.scala and Game.scala itself.
+For other options (deterministic algorithms, etc) see BattleshipsFunctionalTest.scala and Battleships.scala itself.
