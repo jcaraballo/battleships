@@ -18,7 +18,7 @@ Instructions
 
 * Import DSL
 
-    scala> import org.casa.battleships.Game._
+    scala> import org.casa.battleships.Battleships._
 
 * Start the game
 
@@ -44,4 +44,4 @@ Additionally
 
     scala> reset
 
-For other options (deterministic algorithms, etc) see GameTest.scala and Game.scala itself.
+For other options (deterministic algorithms, etc) see BattleshipsTest.scala and Game.scala itself.

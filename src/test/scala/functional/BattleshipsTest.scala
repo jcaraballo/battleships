@@ -1,9 +1,10 @@
-package org.casa.battleships
+package functional
 
 import org.junit.Test
 import org.scalatest.junit.JUnitSuite
-import org.casa.battleships.Game._
-class GameTest extends JUnitSuite {
+import org.casa.battleships.Battleships._
+
+class BattleshipsTest extends JUnitSuite {
   @Test def plays() {
     reset
     configure using deterministicChooser

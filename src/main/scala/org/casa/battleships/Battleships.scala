@@ -6,7 +6,7 @@ import org.casa.battleships.Position.pos
 import strategy.positionchoice.{RandomPositionChooser, PositionChooser, UpmostAndThenLeftmostPositionChooser}
 import strategy.shooting._
 
-object Game {
+object Battleships {
   var settings: GameSettings = _
   var dashboard: AsciiDashboard = _
 
