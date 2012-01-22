@@ -6,12 +6,12 @@ import strategy.shooting.Shooter
 import collection.immutable.{Nil, List}
 
 class ComputerPlayer(val positionChooser: PositionChooser, val shooter: Shooter, val boardSize: Int, val shipSizes: List[Int]) {
-  val myBoard: Board = new Board(boardSize, new FleetComposer(positionChooser).create(boardSize, shipSizes).get)
+  val board: Board = new Board(boardSize, new FleetComposer(positionChooser).create(boardSize, shipSizes).get)
   var myLastShotAtTheEnemy: Option[Position] = None
   var historyOfMyShotsAtTheEnemy: List[(Position, ShotOutcome.Value)] = Nil
 
   def playFirstTurn(firstShot: Position): Turn = {
-    val outcome: ShotOutcome.Value = myBoard.shoot(firstShot)
+    val outcome: ShotOutcome.Value = board.shoot(firstShot)
     val shotBack: Position = shooter.shoot(enemyPositionsToBeShot, historyOfMyShotsAtTheEnemy).get
 
     myLastShotAtTheEnemy = Some(shotBack)
@@ -21,7 +21,7 @@ class ComputerPlayer(val positionChooser: PositionChooser, val shooter: Shooter,
 
   def play(enemiesTurn: Turn): Turn = {
     historyOfMyShotsAtTheEnemy = (myLastShotAtTheEnemy.get, enemiesTurn.lastShotOutcome) :: historyOfMyShotsAtTheEnemy
-    val outcomeOfTheLastShotFromTheEnemyToMe: ShotOutcome.Value = myBoard.shoot(enemiesTurn.shotBack)
+    val outcomeOfTheLastShotFromTheEnemyToMe: ShotOutcome.Value = board.shoot(enemiesTurn.shotBack)
 
     val shotBack: Position = shooter.shoot(enemyPositionsToBeShot, historyOfMyShotsAtTheEnemy).get
 

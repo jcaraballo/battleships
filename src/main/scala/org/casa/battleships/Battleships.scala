@@ -5,6 +5,7 @@ import strategy.FleetComposer
 import org.casa.battleships.Position.pos
 import strategy.positionchoice.{RandomPositionChooser, PositionChooser, UpmostAndThenLeftmostPositionChooser}
 import strategy.shooting._
+import org.casa.battleships.strategy.shooting.Shooters.bestShooter
 
 object Battleships {
   var settings: GameSettings = _
@@ -16,8 +17,9 @@ object Battleships {
   val randomShooter = new RandomShooter
   val deterministicShooter = new OneOneShooter
 
-  var historyOfComputerShotsAtUser: List[(Position, ShotOutcome.Value)] = Nil
-
+  var computerPlayer: ComputerPlayer = _
+  var outcomeOfTheLastComputerShotAtTheUser: Option[ShotOutcome.Value] = None
+  
   reset
 
   def reset {
@@ -28,22 +30,12 @@ object Battleships {
                       var shipSizes: List[Int],
                       var positionChooser: PositionChooser,
                       var computerShooter: Shooter){
-    def this() = this(10, 5::4::3::3::2::Nil, randomChooser,
-      new SequentialShooter(
-        new LinesShooter(randomChooser),
-        new AimAtNextToHitShooter(randomChooser),
-        randomShooter)
-    )
+    def this() = this(10, 5::4::3::3::2::Nil, randomChooser, bestShooter)
 
-    private def createComputerBoard: Board = {
-      new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes).get)
+    def createDashboard(computerBoard: Board): AsciiDashboard = {
+      val userBoard = new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes).get)
+      new AsciiDashboard(computerBoard, userBoard)
     }
-
-    private def createUserBoard: Board = {
-      new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes).get)
-    }
-
-    def createDashboard: AsciiDashboard = new AsciiDashboard(createComputerBoard, createUserBoard)
   }
 
   def quickMode = new GameSettings {
@@ -71,28 +63,27 @@ object Battleships {
   def configure: GameConfigurer = new GameConfigurer
 
   def start: String = {
-    dashboard = settings.createDashboard
+    computerPlayer = new ComputerPlayer(settings.positionChooser, settings.computerShooter, settings.gridSize, settings.shipSizes)
+    outcomeOfTheLastComputerShotAtTheUser = None
+
+    dashboard = settings.createDashboard(computerPlayer.board)
     "\n==========\nNew Game\n==========" + normalPrompt
   }
 
   def shoot(column: Int, row: Int): String = {
-    def computerShootsUser(shootable: Set[Position]): Position = {
-      settings.computerShooter.shoot(shootable, historyOfComputerShotsAtUser).get
-    }
-
-    def saveHistory(position: Position, outcome: ShotOutcome.Value){
-      historyOfComputerShotsAtUser = (position, outcome) :: historyOfComputerShotsAtUser
-    }
-
     val positionWhereUserShootsComputer: Position = pos(column, row)
-    val userShootsComputerOutcome: ShotOutcome.Value = dashboard.computerBoard.shoot(positionWhereUserShootsComputer)
 
-    val positionWhereComputerShootsUser: Position = computerShootsUser(dashboard.userBoard.shootable)
+    val turn: Turn = outcomeOfTheLastComputerShotAtTheUser match {
+      case None => computerPlayer.playFirstTurn(positionWhereUserShootsComputer)
+      case Some(outcome) => computerPlayer.play(Turn(outcome, positionWhereUserShootsComputer))
+    }
+
+    val positionWhereComputerShootsUser: Position = turn.shotBack
     val computerShootsUserOutcome: ShotOutcome.Value = dashboard.userBoard.shoot(positionWhereComputerShootsUser)
+    
+    outcomeOfTheLastComputerShotAtTheUser = Some(computerShootsUserOutcome)
 
-    saveHistory(positionWhereComputerShootsUser, computerShootsUserOutcome)
-
-    "\nUser: " + positionWhereUserShootsComputer + " => " + userShootsComputerOutcome +
+    "\nUser: " + positionWhereUserShootsComputer + " => " + turn.lastShotOutcome +
       "\nComputer: " + positionWhereComputerShootsUser.toString + " => " + computerShootsUserOutcome + "\n" + prompt
   }
 
