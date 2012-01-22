@@ -13,10 +13,8 @@ class GameFunctionalTest extends FunSuite {
   test("Extra"){
     val game = new Game(10, 5::4::3::3::2::Nil, new UpmostAndThenLeftmostPositionChooser, new OneOneShooter)
 
-    val computerTurn1: Turn = game.playFirstTurn(pos(10, 10))
-    assertThat(computerTurn1, is(Turn(Water, pos(1, 1))))
+    assertThat(game.playFirstTurn(pos(10, 10)), is(Turn(Water, pos(1, 1))))
 
-    val computerTurn2: Turn = game.play(Turn(Hit, pos(1, 1)))
-    assertThat(computerTurn2, is(Turn(Hit, pos(1, 1))))
+    assertThat(game.play(Turn(Hit, pos(1, 1))), is(Turn(Hit, pos(1, 1))))
   }
 }

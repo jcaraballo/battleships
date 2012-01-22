@@ -6,29 +6,29 @@ import strategy.shooting.Shooter
 import collection.immutable.{Nil, List}
 
 class Game(val boardSize: Int, val shipSizes: List[Int], val positionChooser: PositionChooser, val shooter: Shooter) {
-  val computerBoard: Board = new Board(boardSize, new FleetComposer(positionChooser).create(boardSize, shipSizes).get)
-  var lastShot: Option[Position] = None
-  var historyOfMyShotsToTheEnemy: List[(Position, ShotOutcome.Value)] = Nil
+  val myBoard: Board = new Board(boardSize, new FleetComposer(positionChooser).create(boardSize, shipSizes).get)
+  var myLastShotAtTheEnemy: Option[Position] = None
+  var historyOfMyShotsAtTheEnemy: List[(Position, ShotOutcome.Value)] = Nil
 
   def playFirstTurn(firstShot: Position): Turn = {
-    val outcome: ShotOutcome.Value = computerBoard.shoot(firstShot)
-    val shotBack: Position = shooter.shoot(userShootablePositions, historyOfMyShotsToTheEnemy).get
+    val outcome: ShotOutcome.Value = myBoard.shoot(firstShot)
+    val shotBack: Position = shooter.shoot(enemyPositionsToBeShot, historyOfMyShotsAtTheEnemy).get
 
-    lastShot = Some(shotBack)
+    myLastShotAtTheEnemy = Some(shotBack)
 
     Turn(outcome, shotBack)
   }
 
   def play(enemiesTurn: Turn): Turn = {
-    historyOfMyShotsToTheEnemy = (lastShot.get, enemiesTurn.lastShotOutcome) :: historyOfMyShotsToTheEnemy
-    val outcomeOfTheLastShotFromTheEnemyToMe: ShotOutcome.Value = computerBoard.shoot(enemiesTurn.shotBack)
+    historyOfMyShotsAtTheEnemy = (myLastShotAtTheEnemy.get, enemiesTurn.lastShotOutcome) :: historyOfMyShotsAtTheEnemy
+    val outcomeOfTheLastShotFromTheEnemyToMe: ShotOutcome.Value = myBoard.shoot(enemiesTurn.shotBack)
 
-    val shotBack: Position = shooter.shoot(userShootablePositions, historyOfMyShotsToTheEnemy).get
+    val shotBack: Position = shooter.shoot(enemyPositionsToBeShot, historyOfMyShotsAtTheEnemy).get
 
-    lastShot = Some(shotBack)
+    myLastShotAtTheEnemy = Some(shotBack)
 
     Turn(outcomeOfTheLastShotFromTheEnemyToMe, shotBack)
   }
 
-  private def userShootablePositions = Positions.createGrid(boardSize) -- historyOfMyShotsToTheEnemy.map(_._1).toSet
+  private def enemyPositionsToBeShot = Positions.createGrid(boardSize) -- historyOfMyShotsAtTheEnemy.map(_._1).toSet
 }
