@@ -35,11 +35,11 @@ object Battleships {
         randomShooter)
     )
 
-    def createComputerBoard: Board = {
+    private def createComputerBoard: Board = {
       new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes).get)
     }
 
-    def createUserBoard: Board = {
+    private def createUserBoard: Board = {
       new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes).get)
     }
 

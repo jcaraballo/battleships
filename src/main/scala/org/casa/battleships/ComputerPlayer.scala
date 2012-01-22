@@ -5,7 +5,7 @@ import strategy.positionchoice.PositionChooser
 import strategy.shooting.Shooter
 import collection.immutable.{Nil, List}
 
-class Game(val boardSize: Int, val shipSizes: List[Int], val positionChooser: PositionChooser, val shooter: Shooter) {
+class ComputerPlayer(val positionChooser: PositionChooser, val shooter: Shooter, val boardSize: Int, val shipSizes: List[Int]) {
   val myBoard: Board = new Board(boardSize, new FleetComposer(positionChooser).create(boardSize, shipSizes).get)
   var myLastShotAtTheEnemy: Option[Position] = None
   var historyOfMyShotsAtTheEnemy: List[(Position, ShotOutcome.Value)] = Nil
