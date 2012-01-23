@@ -14,7 +14,7 @@ object Battleships {
   val randomChooser: RandomPositionChooser = new RandomPositionChooser()
   val deterministicChooser = new UpmostAndThenLeftmostPositionChooser
 
-  val randomShooter = new RandomShooter
+  val randomShooter = new ArbitraryShooter(randomChooser)
   val deterministicShooter = new OneOneShooter
 
   var computerPlayer: ComputerPlayer = _
@@ -30,7 +30,7 @@ object Battleships {
                       var shipSizes: List[Int],
                       var positionChooser: PositionChooser,
                       var computerShooter: Shooter){
-    def this() = this(10, 5::4::3::3::2::Nil, randomChooser, bestShooter)
+    def this() = this(10, 5::4::3::3::2::Nil, randomChooser, bestShooter(randomChooser))
 
     def createDashboard(computerBoard: Board): AsciiDashboard = {
       val userBoard = new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes).get)

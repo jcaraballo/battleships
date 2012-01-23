@@ -35,7 +35,8 @@ class GameFunctionalTest extends FunSuite {
   }
 
   test("Finds immaculate ship when there is only one possible place for it") {
-    val computerPlayer = new ComputerPlayer(new UpmostAndThenLeftmostPositionChooser, bestShooter, 10, 5 :: Nil)
+    val chooser: UpmostAndThenLeftmostPositionChooser = new UpmostAndThenLeftmostPositionChooser
+    val computerPlayer = new ComputerPlayer(chooser, bestShooter(chooser), 10, 5 :: Nil)
 
 //    val history = """
 //  1 2 3 4 5 6 7 8 9 0
@@ -53,7 +54,7 @@ class GameFunctionalTest extends FunSuite {
 //  ~~~~~~~~~~~~~~~~~~~
 //  1 2 3 4 5 6 7 8 9 0
 //"""
-    val history = """
+    computerPlayer.historyOfMyShotsAtTheEnemy = createHistoryOfWater("""
   1 2 3 4 5 6 7 8 9 0
   ~~~~~~~~~~~~~~~~~~~
 1{          · · · · ·}1
@@ -68,9 +69,8 @@ class GameFunctionalTest extends FunSuite {
 0{· · · · · · · · · ·}0
   ~~~~~~~~~~~~~~~~~~~
   1 2 3 4 5 6 7 8 9 0
-"""
-    computerPlayer.historyOfMyShotsAtTheEnemy = createHistoryOfWater(history)
+""")
 
-    assertThat(computerPlayer.playFirstTurn(pos(1, 1)).shotBack, anyOf(is(pos(1, 1)), is(pos(2, 1)), is(pos(3, 1)), is(pos(4, 1)), is(pos(5, 1))))
+    assertThat(computerPlayer.playFirstTurn(pos(1, 1)).shotBack, is(pos(1, 1)))
   }
 }

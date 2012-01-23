@@ -1,12 +1,12 @@
 package org.casa.battleships.strategy.shooting
 
-import org.casa.battleships.strategy.positionchoice.RandomPositionChooser
+import org.casa.battleships.strategy.positionchoice.PositionChooser
 
 object Shooters {
-  def bestShooter: SequentialShooter = {
+  def bestShooter(positionChooser: PositionChooser): SequentialShooter = {
     new SequentialShooter(
-      new LinesShooter(new RandomPositionChooser),
-      new AimAtNextToHitShooter(new RandomPositionChooser),
-      new RandomShooter)
+      new LinesShooter(positionChooser),
+      new AimAtNextToHitShooter(positionChooser),
+      new ArbitraryShooter(positionChooser))
   }
 }
