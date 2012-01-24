@@ -5,8 +5,8 @@ import org.casa.battleships.Positions._
 import org.casa.battleships.fleet.ShipLocation
 import collection.immutable.Set
 
-object MultipleLocationShipPlacer {
-  def findAllValidLocations(shipSize: Int, available: Set[Position]): Set[ShipLocation] = {
+object ShipLocationMultiplyPlacer {
+  def findAllShipLocations(shipSize: Int, available: Set[Position]): Set[ShipLocation] = {
     available.map(candidate => {
       val possibleContinuations: Set[Position] = neighbours(candidate) & available
       placeShip(shipSize, available, Set(candidate), possibleContinuations)
@@ -22,7 +22,7 @@ object MultipleLocationShipPlacer {
                   shipSize,
                   available - continuation,
                   chosen + continuation,
-                  MultipleLocationShipPlacer.calculatePossibleContinuations(chosen + continuation) & available - continuation
+                  ShipLocationMultiplyPlacer.calculatePossibleContinuations(chosen + continuation) & available - continuation
                 )
               }
       ).flatten

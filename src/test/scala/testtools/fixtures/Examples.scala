@@ -1,4 +1,4 @@
-package testtools.matching
+package testtools.fixtures
 
 import org.casa.battleships.fleet.{Ship, Fleet}
 import org.casa.battleships.Position._
@@ -12,4 +12,8 @@ object Examples {
       immaculateShip(pos(1, 4), pos(3, 4)),
       immaculateShip(pos(1, 5), pos(2, 5))
     )
+
+  def someFleetConfiguration = List(5, 4, 3, 3, 2)
+
+  def somePosition = pos(1, 1)
 }

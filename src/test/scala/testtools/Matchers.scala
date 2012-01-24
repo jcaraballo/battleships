@@ -1,4 +1,4 @@
-package testtools.matching
+package testtools
 
 import org.junit.internal.matchers.TypeSafeMatcher
 import org.hamcrest.{Description, Matcher}

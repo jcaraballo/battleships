@@ -5,8 +5,8 @@ import org.casa.battleships.fleet._
 import org.mockito.Mockito._
 import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.is
-import testtools.matching.Examples.someFleet
 import org.scalatest.FunSuite
+import testtools.fixtures.Examples.someFleet
 
 class BoardTest extends FunSuite {
 
