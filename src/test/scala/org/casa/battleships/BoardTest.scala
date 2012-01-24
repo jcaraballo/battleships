@@ -1,24 +1,16 @@
 package org.casa.battleships
 
-import org.junit.Test
 import org.casa.battleships.Position.pos
-import org.scalatest.junit.JUnitSuite
-import org.casa.battleships.fleet.Ship.immaculateShip
-import org.casa.battleships.fleet.Fleet
+import org.casa.battleships.fleet._
 import org.mockito.Mockito._
 import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.is
+import testtools.matching.Examples.someFleet
+import org.scalatest.FunSuite
 
-class BoardTest extends JUnitSuite {
-  val someFleet: Fleet = new Fleet(
-    immaculateShip(pos(1, 1), pos(5, 1)),
-    immaculateShip(pos(1, 2), pos(4, 2)),
-    immaculateShip(pos(1, 3), pos(3, 3)),
-    immaculateShip(pos(1, 4), pos(3, 4)),
-    immaculateShip(pos(1, 5), pos(2, 5))
-  )
+class BoardTest extends FunSuite {
 
-  @Test def shootDelegatesToFleetAndUpdatesShotPositions() {
+  test("shoot delegates to fleet and updates shotPositions") {
     val position: Position = mock(classOf[Position])
     val outcome: ShotOutcome.Value = ShotOutcome.Hit
     val fleet: Fleet = mock(classOf[Fleet])
@@ -31,7 +23,7 @@ class BoardTest extends JUnitSuite {
     assertThat(board.shotPositions, is(Set(position)))
   }
 
-  @Test def shootableExcludesAlreadyShotSquares() {
+  test("shootable excludes already shot squares") {
     val all: Set[Position] = Positions.createGrid(10)
 
     val board: Board = new Board(10, someFleet)
@@ -44,7 +36,7 @@ class BoardTest extends JUnitSuite {
     assertThat(board.shootable, is(all - pos(1, 1) - pos(2, 1)))
   }
 
-  @Test def areAllShipsSunkDelegatesToFleet() {
+  test("areAllShipsSunk delegates to Fleet") {
     val sunkFleet: Fleet = new Fleet() {
       override def isSunk = true
     }
