@@ -4,10 +4,11 @@ import org.casa.battleships.strategy.positionchoice.PositionChooser
 import org.casa.battleships.Position
 import annotation.tailrec
 import org.casa.battleships.Positions._
+import org.casa.battleships.fleet.ShipLocation
 
-class ShipPlacer(chooser: PositionChooser) {
+class ShipLocationChooser(chooser: PositionChooser) {
   @tailrec
-  final def place(shipSize: Int, available: Set[Position]): Option[Set[Position]] = {
+  final def place(shipSize: Int, available: Set[Position]): Option[ShipLocation] = {
     chooser.choose(available) match {
       case None => None
       case Some(candidate) => {
@@ -20,20 +21,20 @@ class ShipPlacer(chooser: PositionChooser) {
     }
   }
 
-  def placeShip(shipSize: Int, available: Set[Position], chosen: Set[Position], possibleContinuations: Set[Position]): Option[Set[Position]] = {
+  def placeShip(shipSize: Int, available: Set[Position], chosen: Set[Position], possibleContinuations: Set[Position]): Option[ShipLocation] = {
     if (chosen.size == shipSize) {
-      Some(chosen)
+      Some(new ShipLocation(chosen))
     } else {
       chooser.choose(possibleContinuations) match {
         case None => None
         case Some(chosenContinuation) => {
           val newChosen: Set[Position] = chosen + chosenContinuation
           val newAvailable: Set[Position] = available - chosenContinuation
-          val placement: Option[Set[Position]] = placeShip(
+          val placement: Option[ShipLocation] = placeShip(
             shipSize,
             newAvailable,
             newChosen,
-            ShipPlacer.calculatePossibleContinuations(newChosen) & newAvailable
+            ShipLocationChooser.calculatePossibleContinuations(newChosen) & newAvailable
           )
           placement match {
             case None => placeShip(shipSize, available, chosen, possibleContinuations - chosenContinuation)
@@ -45,7 +46,7 @@ class ShipPlacer(chooser: PositionChooser) {
   }
 }
 
-object ShipPlacer {
+object ShipLocationChooser {
   def calculatePossibleContinuations(chosen: Set[Position]): Set[Position] = {
     if (chosen.size == 1) {
       neighbours(chosen.head)

@@ -2,12 +2,13 @@ package org.casa.battleships.strategy
 
 import org.junit.Test
 import org.casa.battleships.Position.pos
-import org.casa.battleships.strategy.ShipPlacer._
+import org.casa.battleships.strategy.ShipLocationChooser._
 import org.scalatest.junit.JUnitSuite
 import org.casa.battleships.Position
 import org.casa.battleships.strategy.positionchoice.UpmostAndThenLeftmostPositionChooser
+import org.casa.battleships.fleet.ShipLocation
 
-class ShipPlacerTest extends JUnitSuite {
+class ShipLocationChooserTest extends JUnitSuite {
   val chooser = new UpmostAndThenLeftmostPositionChooser
 
   @Test def possibleContinuationsAreUpRightDownLeftWhenThereIsOnlyOneChosenSquare {
@@ -30,17 +31,17 @@ class ShipPlacerTest extends JUnitSuite {
   }
 
   @Test def takesAllWhenThatIsTheOnlyWay() {
-    expect(Some(Set(pos(2, 1), pos(3, 1)))) {
-      new ShipPlacer(chooser).place(2, Set(pos(2, 1), pos(3, 1)))
+    expect(Some(new ShipLocation(Set(pos(2, 1), pos(3, 1))))) {
+      new ShipLocationChooser(chooser).place(2, Set(pos(2, 1), pos(3, 1)))
     }
   }
 
   @Test def failsToPlaceShipWhenThereIsNoSpace() {
     expect(None) {
-      new ShipPlacer(chooser).place(2, Set(pos(2, 1)))
+      new ShipLocationChooser(chooser).place(2, Set(pos(2, 1)))
     }
     expect(None) {
-      new ShipPlacer(chooser).place(2, Set[Position]())
+      new ShipLocationChooser(chooser).place(2, Set[Position]())
     }
   }
 }
