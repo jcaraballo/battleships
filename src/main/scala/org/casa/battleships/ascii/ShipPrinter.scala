@@ -1,7 +1,7 @@
 package org.casa.battleships.ascii
 
-import org.casa.battleships.fleet.Ship
 import org.casa.battleships.Position
+import org.casa.battleships.fleet.{ShipLocation, Ship}
 
 class ShipPrinter(
   val leftEnd: Char,
@@ -13,7 +13,8 @@ class ShipPrinter(
   val hit: Char){
 
   def printShipSquareAt(ship: Ship, position: Position): Char = {
-    if (!ship.squares.contains(position)){
+    val location: ShipLocation = ship.location
+    if (!location.contains(position)){
       throw new IllegalArgumentException("Ship " + ship + " does not occupy position " + position)
     }
 
@@ -24,8 +25,8 @@ class ShipPrinter(
     val X = true
     val o = false
 
-    if(ship.isHorizontal){
-      val neighbourhood = (ship.contains(position.left), true, ship.contains(position.right))
+    if(location.isHorizontal){
+      val neighbourhood = (location.contains(position.left), true, location.contains(position.right))
       neighbourhood match {
         case (X, X, X) => horizontalMiddle
         case (X, X, o) => rightEnd
@@ -34,7 +35,7 @@ class ShipPrinter(
       }
 
     }else{
-      val neighbourhood = (ship.contains(position.up), true, ship.contains(position.down))
+      val neighbourhood = (location.contains(position.up), true, location.contains(position.down))
       neighbourhood match {
         case (
             X,

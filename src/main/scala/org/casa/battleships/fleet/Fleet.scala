@@ -19,10 +19,10 @@ case class Fleet (ships: Set[Ship]) {
       }
       false
     }
-    repeats(ships.toList.flatMap(_.squares.toList))
+    repeats(ships.toList.flatMap(_.location.squares.toList))
   }
 
-  def shipAt(position: Position): Option[Ship] = ships.find(_.squares.contains(position))
+  def shipAt(position: Position): Option[Ship] = ships.find(_.location.contains(position))
 
   def shootAt(position: Position): (Fleet, ShotOutcome.Value) = {
     val affectedShip: Option[Ship] = shipAt(position)

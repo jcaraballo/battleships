@@ -3,18 +3,19 @@ package org.casa.battleships
 import org.junit.Test
 import org.casa.battleships.Position.pos
 import org.scalatest.junit.JUnitSuite
-import org.casa.battleships.fleet._
+import org.casa.battleships.fleet.Ship.immaculateShip
+import org.casa.battleships.fleet.Fleet
 import org.mockito.Mockito._
 import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.is
 
 class BoardTest extends JUnitSuite {
   val someFleet: Fleet = new Fleet(
-    new Ship(pos(1, 1), pos(5, 1)),
-    new Ship(pos(1, 2), pos(4, 2)),
-    new Ship(pos(1, 3), pos(3, 3)),
-    new Ship(pos(1, 4), pos(3, 4)),
-    new Ship(pos(1, 5), pos(2, 5))
+    immaculateShip(pos(1, 1), pos(5, 1)),
+    immaculateShip(pos(1, 2), pos(4, 2)),
+    immaculateShip(pos(1, 3), pos(3, 3)),
+    immaculateShip(pos(1, 4), pos(3, 4)),
+    immaculateShip(pos(1, 5), pos(2, 5))
   )
 
   @Test def shootDelegatesToFleetAndUpdatesShotPositions() {

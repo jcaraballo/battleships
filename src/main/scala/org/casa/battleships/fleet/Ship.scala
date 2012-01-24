@@ -1,54 +1,21 @@
 package org.casa.battleships.fleet
 
-import org.casa.battleships.fleet.Ship.positions
-import org.casa.battleships.{Positions, Position}
+import org.casa.battleships.Position
 
-case class Ship(squares: Set[Position], squaresHit: Set[Position]) {
-  def this(initial: Position, end: Position) = {
-    this (positions(initial, end), Set[Position]())
-  }
-
-  def isHorizontal: Boolean = Positions.areHorizontal(squares)
-
-  def contains(position: Position) = squares.contains(position)
-
+case class Ship(location: ShipLocation, squaresHit: Set[Position]) {
   def shootAt(position: Position): Ship = {
-    if (squares.contains(position)) {
-      Ship(squares, squaresHit + position)
+    if (location.contains(position)) {
+      Ship(location, squaresHit + position)
     } else {
       throw new IllegalArgumentException("Ship does not occupy position " + position)
     }
   }
 
-  def isSunk: Boolean = (squares == squaresHit)
+  def isSunk: Boolean = (location.squares == squaresHit)
 }
 
 object Ship {
-  private def verticalPositions(initial: Position, end: Position): Set[Position] = {
-    if (initial.row < end.row) {
-      (for (row <- initial.row to end.row) yield Position(initial.column, row)).toSet
-    } else {
-      verticalPositions(end, initial)
-    }
-  }
+  def immaculateShip(squares: Set[Position]) = new Ship(new ShipLocation(squares), Set[Position]())
 
-  private def horizontalPositions(initial: Position, end: Position): Set[Position] = {
-    if (initial.column < end.column) {
-      (for (column <- initial.column to end.column) yield Position(column, initial.row)).toSet
-    } else {
-      horizontalPositions(end, initial)
-    }
-  }
-
-  def positions(initial: Position, end: Position): Set[Position] = {
-    if (initial.column == end.column) {
-      if (initial.row == end.row) {
-        throw new IllegalArgumentException("Single square ships are not allowed")
-      } else {
-        verticalPositions(initial, end)
-      }
-    } else {
-      horizontalPositions(initial, end)
-    }
-  }
+  def immaculateShip(initial: Position, end: Position) = new Ship(new ShipLocation(initial, end), Set[Position]())
 }

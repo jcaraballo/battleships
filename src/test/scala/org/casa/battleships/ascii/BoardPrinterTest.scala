@@ -2,15 +2,16 @@ package org.casa.battleships.ascii
 
 import org.casa.battleships.Position.pos
 import org.scalatest.junit.JUnitSuite
-import org.casa.battleships.fleet._
+import org.casa.battleships.fleet.Ship.immaculateShip
+import org.casa.battleships.fleet.Fleet
 
 import org.casa.battleships.Board
 import org.junit.{Before, Test}
 
 class BoardPrinterTest extends JUnitSuite {
   val board: Board = new Board(4, new Fleet(
-    new Ship(pos(1, 1), pos(3, 1)),
-    new Ship(pos(2, 2), pos(2, 3))
+    immaculateShip(pos(1, 1), pos(3, 1)),
+    immaculateShip(pos(2, 2), pos(2, 3))
   ))
 
   @Before def shootABit(){

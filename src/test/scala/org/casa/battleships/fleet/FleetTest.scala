@@ -5,14 +5,15 @@ import org.casa.battleships.Position.pos
 import org.scalatest.junit.JUnitSuite
 import org.casa.battleships.Position
 import org.casa.battleships.ShotOutcome._
+import Ship.immaculateShip
 
 class FleetTest extends JUnitSuite {
   @Test def hasShips() {
-    val aircraftCarrier = new Ship(pos(1, 1), pos(5, 1))
-    val battleship = new Ship(pos(1, 2), pos(4, 2))
-    val destroyer = new Ship(pos(1, 3), pos(3, 3))
-    val submarine = new Ship(pos(1, 4), pos(3, 4))
-    val patrolBoat = new Ship(pos(1, 5), pos(2, 5))
+    val aircraftCarrier = immaculateShip(pos(1, 1), pos(5, 1))
+    val battleship = immaculateShip(pos(1, 2), pos(4, 2))
+    val destroyer = immaculateShip(pos(1, 3), pos(3, 3))
+    val submarine = immaculateShip(pos(1, 4), pos(3, 4))
+    val patrolBoat = immaculateShip(pos(1, 5), pos(2, 5))
 
     expect(Set[Ship](aircraftCarrier, battleship, destroyer, submarine, patrolBoat)) {
       new Fleet(
@@ -27,7 +28,7 @@ class FleetTest extends JUnitSuite {
 
   @Test def shipsSharingSquareCannotFormAValidFleet() {
     try {
-      fleetIncluding(new Ship(pos(1, 1), pos(5, 1)), new Ship(pos(4, 1), pos(7, 1)))
+      fleetIncluding(immaculateShip(pos(1, 1), pos(5, 1)), immaculateShip(pos(4, 1), pos(7, 1)))
       fail()
     }
     catch {
@@ -36,7 +37,7 @@ class FleetTest extends JUnitSuite {
   }
 
   @Test def shipAtReturnsSomeShipWhenThereIsOneAtTheGivenPosition(){
-    val aircraftCarrier = new Ship(pos(1, 1), pos(5, 1))
+    val aircraftCarrier = immaculateShip(pos(1, 1), pos(5, 1))
     expect(Some(aircraftCarrier)){
       fleetIncluding(aircraftCarrier).shipAt(pos(1,1))
     }
@@ -55,7 +56,7 @@ class FleetTest extends JUnitSuite {
   }
 
   @Test def shootAtReturnsUpdatedSelfPlusHitIfThereIsShipInSuchPositionThatDoesNotSink(){
-    val newShip = new Ship(Set(pos(1, 1), pos(2, 1), pos(3, 1)), Set[Position]())
+    val newShip = immaculateShip(Set(pos(1, 1), pos(2, 1), pos(3, 1)))
     val fleet: Fleet = new Fleet(Set(newShip))
 
     expect((new Fleet(Set(newShip.shootAt(pos(1, 1)))), Hit)) {
@@ -64,7 +65,7 @@ class FleetTest extends JUnitSuite {
   }
 
   @Test def shootAtReturnsUpdatedSelfPlusSunkIfThereIsShipInSuchPositionThatSinks(){
-    val dodgyShip = new Ship(Set(pos(1, 1), pos(2, 1), pos(3, 1)), Set(pos(1, 1), pos(2, 1)))
+    val dodgyShip = new Ship(new ShipLocation(Set(pos(1, 1), pos(2, 1), pos(3, 1))), Set(pos(1, 1), pos(2, 1)))
     val fleet: Fleet = new Fleet(Set(dodgyShip))
 
     val sunkShip: Ship = dodgyShip.shootAt(pos(3, 1))
@@ -76,10 +77,10 @@ class FleetTest extends JUnitSuite {
 
   @Test def isSunkIffAllShipsAreSunk() {
     def sunk(ps: Position*): Ship = {
-      new Ship(ps.toSet, ps.toSet)
+      new Ship(new ShipLocation(ps.toSet), ps.toSet)
     }
     def perfect(ps: Position*): Ship = {
-      new Ship(ps.toSet, Set[Position]())
+      new Ship(new ShipLocation(ps.toSet), Set[Position]())
     }
 
     expect(true) {
@@ -94,16 +95,16 @@ class FleetTest extends JUnitSuite {
   }
 
   private def fleetIncluding(ships: Ship*): Fleet = {
-    new Fleet(ships.toSet + new Ship(pos(1, 3), pos(3, 3)) + new Ship(pos(1, 4), pos(3, 4)) + new Ship(pos(1, 5), pos(2, 5)))
+    new Fleet(ships.toSet + immaculateShip(pos(1, 3), pos(3, 3)) + immaculateShip(pos(1, 4), pos(3, 4)) + immaculateShip(pos(1, 5), pos(2, 5)))
   }
 
   private def fleetWithoutShipAtTenTen: Fleet = {
     new Fleet(
-      new Ship(pos(1, 1), pos(5, 1)),
-      new Ship(pos(1, 2), pos(4, 2)),
-      new Ship(pos(1, 3), pos(3, 3)),
-      new Ship(pos(1, 4), pos(3, 4)),
-      new Ship(pos(1, 5), pos(2, 5))
+      immaculateShip(pos(1, 1), pos(5, 1)),
+      immaculateShip(pos(1, 2), pos(4, 2)),
+      immaculateShip(pos(1, 3), pos(3, 3)),
+      immaculateShip(pos(1, 4), pos(3, 4)),
+      immaculateShip(pos(1, 5), pos(2, 5))
     )
   }
 }
