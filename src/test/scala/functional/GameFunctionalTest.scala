@@ -8,12 +8,10 @@ import org.casa.battleships.ShotOutcome.{Water, Hit}
 import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.is
 import org.casa.battleships.strategy.shooting.Shooters.bestShooter
-import collection.Iterator
-import collection.immutable.IndexedSeq
-import util.matching.Regex.MatchIterator
 import org.casa.battleships._
 import testtools.fixtures.Examples.somePosition
 import testtools.fixtures.Examples.classicFleetConfiguration
+import testtools.fixtures.Builders.createHistoryOfWater
 
 class GameFunctionalTest extends FunSuite {
   test("Plays game where user starts") {
@@ -22,17 +20,6 @@ class GameFunctionalTest extends FunSuite {
     assertThat(computerPlayer.playFirstTurn(pos(10, 10)), is(Turn(Water, pos(1, 1))))
 
     assertThat(computerPlayer.play(Turn(Hit, pos(1, 1))), is(Turn(Hit, pos(1, 1))))
-  }
-
-  def createHistoryOfWater(history: String): List[(Position, ShotOutcome.Value)] = {
-    val lines: MatchIterator = """\{[^}]*\}""".r.findAllIn(history)
-    val stringRepresentationOfPositionsWithZeroBasedColumn: Iterator[IndexedSeq[(Char, Int)]] =
-      lines.map(_.zipWithIndex.filter(((c: Char, i: Int) => i % 2 != 0).tupled).map(((c: Char, i: Int) => c).tupled).zipWithIndex)
-    val charactersWithPositions: Iterator[(Char, Position)] = stringRepresentationOfPositionsWithZeroBasedColumn.zipWithIndex.flatMap(
-      ((v: IndexedSeq[(Char, Int)], i: Int) => v.map((t: (Char, Int)) => (t._1, pos(t._2 + 1, i + 1)))).tupled
-    )
-    val waterPositions: Iterator[Position] = charactersWithPositions.filter((t: (Char, Position)) => t._1 == '·').map((t: (Char, Position)) => t._2)
-    waterPositions.map((_, Water)).toList
   }
 
   ignore("Finds immaculate ship when there is only one possible place for it") {
