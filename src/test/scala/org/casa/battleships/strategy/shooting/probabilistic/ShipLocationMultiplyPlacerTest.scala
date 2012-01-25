@@ -1,16 +1,14 @@
-package org.casa.battleships.strategy
+package org.casa.battleships.strategy.shooting.probabilistic
 
 import org.scalatest.FunSuite
-import positionchoice.PositionChooser
 import ShipLocationMultiplyPlacer.findAllShipLocations
 import org.casa.battleships.Position.pos
 import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.is
 import collection.immutable.Set
 import org.casa.battleships.Positions.createGrid
-import org.casa.battleships.ascii.BoardPrinters
-import org.casa.battleships.fleet.{Fleet, Ship, ShipLocation}
-import org.casa.battleships.{Board, Position}
+import org.casa.battleships.fleet.ShipLocation
+import org.casa.battleships.Position
 import testtools.Matchers.isEmpty
 
 class ShipLocationMultiplyPlacerTest extends FunSuite {
@@ -59,7 +57,7 @@ class ShipLocationMultiplyPlacerTest extends FunSuite {
       new ShipLocation(pos(3, 2), pos(3, 3))
     )))
   }
-  
+
 //  // Performance comparison:
 //  //     findAllShipLocations(2, grid).headOption is around 150 times slower than
 //  //     new ShipLocationChooser(firstChooser).place(2, grid)

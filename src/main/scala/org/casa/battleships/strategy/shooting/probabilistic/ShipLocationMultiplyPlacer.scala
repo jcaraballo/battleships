@@ -1,4 +1,4 @@
-package org.casa.battleships.strategy
+package org.casa.battleships.strategy.shooting.probabilistic
 
 import org.casa.battleships.Position
 import org.casa.battleships.Positions._

@@ -1,4 +1,4 @@
-package org.casa.battleships.strategy
+package org.casa.battleships.strategy.shooting.probabilistic
 
 import org.scalatest.FunSuite
 import org.junit.Assert.assertThat
@@ -34,7 +34,7 @@ class FleetLocationMultiplyPlacerTest extends FunSuite {
       new FleetLocation(horizontalShips), new FleetLocation(verticalShips)
     )))
   }
-  
+
   test("Finds unique fleet when there is only one place where it fits"){
     val waterPositions = createHistoryOfWater("""
       1 2 3 4 5 6 7 8 9 0

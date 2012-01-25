@@ -1,9 +1,9 @@
-package org.casa.battleships.strategy
+package org.casa.battleships.strategy.shooting.probabilistic
 
 import org.casa.battleships.Position
 import collection.immutable.Set
 import org.casa.battleships.fleet.{ShipLocation, FleetLocation}
-import org.casa.battleships.strategy.ShipLocationMultiplyPlacer.findAllShipLocations
+import ShipLocationMultiplyPlacer.findAllShipLocations
 
 object FleetLocationMultiplyPlacer {
   def findAllValidLocations(shipSizes: List[Int], available: Set[Position]): Set[FleetLocation] = {
