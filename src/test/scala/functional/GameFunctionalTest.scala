@@ -13,10 +13,11 @@ import collection.immutable.IndexedSeq
 import util.matching.Regex.MatchIterator
 import org.casa.battleships._
 import testtools.fixtures.Examples.somePosition
+import testtools.fixtures.Examples.classicFleetConfiguration
 
 class GameFunctionalTest extends FunSuite {
   test("Plays game where user starts") {
-    val computerPlayer = new ComputerPlayer(new UpmostAndThenLeftmostPositionChooser, new OneOneShooter, 10, 5 :: 4 :: 3 :: 3 :: 2 :: Nil)
+    val computerPlayer = new ComputerPlayer(new UpmostAndThenLeftmostPositionChooser, new OneOneShooter, 10, classicFleetConfiguration)
 
     assertThat(computerPlayer.playFirstTurn(pos(10, 10)), is(Turn(Water, pos(1, 1))))
 
