@@ -6,11 +6,11 @@ import org.casa.battleships.fleet.{ShipLocation, FleetLocation}
 import akka.pattern.ask
 import akka.dispatch.Await
 import akka.util.duration._
-import akka.util.{FiniteDuration, Timeout}
 import FleetLocationMultiplyPlacerActor._
 import akka.actor.{ActorRef, Props, Actor}
 import java.util.concurrent.TimeoutException
 import akka.event.Logging
+import akka.util.{Duration, Timeout}
 
 class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor {
 
@@ -18,7 +18,7 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
 
   val log = Logging(system, this)
 
-  private val duration: FiniteDuration = 1 second
+  private val duration: Duration = 1 second
   implicit val timeout = Timeout(duration)
 
   def receive = {
@@ -26,9 +26,7 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
       log.info("Entered Request(" + shipSizes + ", " + available + ")")
       try {
         val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(shipSizes, Set((new FleetLocation(Set()), available)))
-        val allFleetLocations = Await.result(future, duration).asInstanceOf[Response].allFleetLocations
-
-        sender ! Response(allFleetLocations)
+        sender ! Await.result(future, duration).asInstanceOf[GenericResponse]
       }
       catch {
         case e: TimeoutException => {
@@ -51,7 +49,11 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
               }
 
               val future1 = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(restShipSizes, lol)
-              Await.result(future1, duration).asInstanceOf[Response].allFleetLocations
+              Await.result(future1, duration) match {
+                case response: Response => response.allFleetLocations
+                case exceptional: ExceptionalResponse => sender ! exceptional; Set() //should kill myself
+                case e => log.error("Unexpected"); throw new IllegalArgumentException
+              }
             }
             sender ! Response(validFleetWithWhatLeavesAvailable.flatMap(t.tupled))
           }
@@ -71,11 +73,9 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
 object FleetLocationMultiplyPlacerActor {
 
   case class Request(shipSizes: List[Int], available: Set[Position])
-
-  case class Response(allFleetLocations: Set[FleetLocation])
-
-  case class ExceptionalResponse(exception: Exception)
-
   case class SelfRequest(shipSizes: List[Int], validFleetWithWhatLeavesAvailable: Set[(FleetLocation, Set[Position])])
 
+  case class GenericResponse()
+  case class Response(allFleetLocations: Set[FleetLocation]) extends GenericResponse
+  case class ExceptionalResponse(exception: Exception) extends GenericResponse
 }

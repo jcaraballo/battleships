@@ -14,6 +14,9 @@ import testtools.fixtures.Examples._
 import org.casa.battleships.fleet.{FleetLocation, ShipLocation}
 import org.casa.battleships.{Positions, Position}
 import testtools.fixtures.Builders._
+import testtools.fixtures.Examples
+import org.hamcrest.CoreMatchers
+import java.util.concurrent.TimeoutException
 
 class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterEach {
 
@@ -63,6 +66,17 @@ class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterE
     assertThat(findThemAll(5 :: Nil, available), is(Set(
       new FleetLocation(Set(ShipLocation(Set(pos(1, 10), pos(2, 10), pos(3, 10), pos(4, 10), pos(5, 10)))))
     )))
+  }
+
+  test("Times out when request takes longer than time out"){
+    val future = fleetPlacer.ask(FleetLocationMultiplyPlacerActor.Request(Examples.classicFleetConfiguration, Positions.createGrid(10)))
+    try {
+      Await.result(future, 1 milli)
+      fail("Should throw a TimeoutException")
+    }
+    catch {
+      case e: TimeoutException => null // expected
+    }
   }
 
   val duration: Duration = 1 second
