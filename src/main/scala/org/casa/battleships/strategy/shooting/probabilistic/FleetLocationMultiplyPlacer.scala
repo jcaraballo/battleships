@@ -7,16 +7,7 @@ import ShipLocationMultiplyPlacer.findAllShipLocations
 
 object FleetLocationMultiplyPlacer {
   def findAllValidLocations(shipSizes: List[Int], available: Set[Position]): Set[FleetLocation] = {
-    shipSizes match {
-      case next :: rest => {
-        val fleetsWithWhatTheyLeaveAvailable = findAllShipLocations(next, available).map {
-          shipLocation =>
-            (new FleetLocation(Set(shipLocation)), available -- shipLocation.squares)
-        }
-        recursiveFindAllValidLocations(rest, fleetsWithWhatTheyLeaveAvailable)
-      }
-      case empty => Set()
-    }
+    recursiveFindAllValidLocations(shipSizes, Set((new FleetLocation(Set()), available)))
   }
 
   private def recursiveFindAllValidLocations(shipSizes: List[Int], validFleetWithWhatLeavesAvailable: Set[(FleetLocation, Set[Position])]): Set[FleetLocation] = {

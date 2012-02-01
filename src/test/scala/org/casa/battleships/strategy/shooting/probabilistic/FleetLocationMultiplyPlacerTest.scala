@@ -17,7 +17,7 @@ class FleetLocationMultiplyPlacerTest extends FunSuite {
   }
 
   test("Empty fleet when no ships to place") {
-    assertThat(findAllValidLocations(Nil, Positions.createGrid(10)), is(Set[FleetLocation]()))
+    assertThat(findAllValidLocations(Nil, Positions.createGrid(10)), is(Set(new FleetLocation(Set[ShipLocation]()))))
   }
 
   test("All possible fleets for 2 ships of 2 squares in grid") {

@@ -24,30 +24,14 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
   def receive = {
     case Request(shipSizes, available) => {
       try {
-        shipSizes match {
-          case next :: rest => {
-            log.info("Delegating to shipsPlacerActor")
-            val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(next, available)
-            val result = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
-            log.info("Back from delegating to shipsPlacerActor")
-
-            val fleetsWithWhatTheyLeaveAvailable = result.allShipLocations.map {
-              shipLocation =>
-                (new FleetLocation(Set(shipLocation)), available -- shipLocation.squares)
-            }
-
             log.info("Delegating to self")
-
-            val future1 = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(rest, fleetsWithWhatTheyLeaveAvailable)
-            val allFleetLocations = Await.result(future1, duration).asInstanceOf[Response].allFleetLocations
+            val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(shipSizes, Set((new FleetLocation(Set()), available)))
+            val allFleetLocations = Await.result(future, duration).asInstanceOf[Response].allFleetLocations
             log.info("Back from delegating to self")
 
             log.info("Sending reponse")
             sender ! Response(allFleetLocations)
             log.info("Sent reponse")
-          }
-          case empty => sender ! Response(Set())
-        }
       }
       catch {
         case e: TimeoutException => {
