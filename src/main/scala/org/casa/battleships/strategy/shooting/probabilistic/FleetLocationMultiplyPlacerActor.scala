@@ -25,10 +25,10 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
     case Request(shipSizes, available) => {
       log.info("Entered Request(" + shipSizes + ", " + available + ")")
       try {
-            val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(shipSizes, Set((new FleetLocation(Set()), available)))
-            val allFleetLocations = Await.result(future, duration).asInstanceOf[Response].allFleetLocations
+        val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(shipSizes, Set((new FleetLocation(Set()), available)))
+        val allFleetLocations = Await.result(future, duration).asInstanceOf[Response].allFleetLocations
 
-            sender ! Response(allFleetLocations)
+        sender ! Response(allFleetLocations)
       }
       catch {
         case e: TimeoutException => {
