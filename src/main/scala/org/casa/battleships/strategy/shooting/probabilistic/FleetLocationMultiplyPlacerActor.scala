@@ -6,6 +6,7 @@ import org.casa.battleships.fleet.{ShipLocation, FleetLocation}
 import akka.pattern.ask
 import akka.dispatch.Await
 import akka.util.duration._
+import akka.util.{FiniteDuration, Timeout}
 import FleetLocationMultiplyPlacerActor._
 import akka.actor.{ActorRef, Props, Actor}
 import java.util.concurrent.TimeoutException
@@ -29,8 +30,8 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
         sender ! Await.result(future, duration).asInstanceOf[GenericResponse]
       }
       catch {
-        case e: TimeoutException => {
-          log.info("Timed out while processing Request(" + shipSizes + ", " + available + "): " + e.getMessage + ", because: " + e.getCause + ", stack trace: " + e.getStackTrace + ", rethrowing")
+        case e => {
+          log.info("While processing Request(" + shipSizes + ", " + available + ") exception was thrown, sending back wrapped in ExceptionalReponse: " + e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
           sender ! ExceptionalResponse(e)
         }
       }
@@ -61,8 +62,8 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
         }
       }
       catch {
-        case e: TimeoutException => {
-          log.info("Timed out while processing SelfRequest(" + shipSizes + ", " + validFleetWithWhatLeavesAvailable + "): " + e.getMessage + ", because: " + e.getCause + ", stack trace: " + e.getStackTrace + ", rethrowing")
+        case e => {
+          log.info("While processing SelfRequest("  + shipSizes + ", " + validFleetWithWhatLeavesAvailable + ") exception was thrown, sending back wrapped in ExceptionalReponse: " + e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
           sender ! ExceptionalResponse(e)
         }
       }
@@ -77,5 +78,5 @@ object FleetLocationMultiplyPlacerActor {
 
   case class GenericResponse()
   case class Response(allFleetLocations: Set[FleetLocation]) extends GenericResponse
-  case class ExceptionalResponse(exception: Exception) extends GenericResponse
+  case class ExceptionalResponse(exception: Throwable) extends GenericResponse
 }

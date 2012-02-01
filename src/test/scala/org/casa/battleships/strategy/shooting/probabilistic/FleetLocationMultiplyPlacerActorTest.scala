@@ -87,15 +87,15 @@ class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterE
 
   private def findThemAll(shipSizes: List[Int], available: Set[Position]): Set[FleetLocation] = {
     val future = fleetPlacer.ask(FleetLocationMultiplyPlacerActor.Request(shipSizes, available))
-    val unCastedResponse: Any = Await.result(future, duration)
+    Await.result(future, duration) match {
+      case response: FleetLocationMultiplyPlacerActor.Response => response.allFleetLocations
 
-    if (unCastedResponse.isInstanceOf[FleetLocationMultiplyPlacerActor.ExceptionalResponse]) {
-      throw new RuntimeException("Got ExceptionalResponse back", unCastedResponse.asInstanceOf[FleetLocationMultiplyPlacerActor.ExceptionalResponse].exception)
+      case exceptionalResponse: FleetLocationMultiplyPlacerActor.ExceptionalResponse => {
+        throw new RuntimeException("Got ExceptionalResponse back", exceptionalResponse.exception)
+      }
+
+      case unexpected => throw new IllegalStateException("Got unexpected response back" + unexpected)
     }
-
-    val response = unCastedResponse.asInstanceOf[FleetLocationMultiplyPlacerActor.Response]
-
-    response.allFleetLocations
   }
 
   override def beforeEach() {
