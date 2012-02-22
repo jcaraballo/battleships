@@ -4,9 +4,11 @@ version := "1.0"
 
 scalaVersion := "2.9.1"
 
+resolvers += "Typesafe Repository" at "http://repo.typesafe.com/typesafe/releases/"
+
 libraryDependencies ++= Seq(
   "junit" % "junit" % "4.10" % "test->default",
   "org.scalatest" %% "scalatest" % "1.6.1" % "test",
   "org.mockito" % "mockito-core" % "1.9.0" % "test",
-  "com.typesafe.akka" % "akka-actor" % "2.0-M3"
+  "com.typesafe.akka" % "akka-actor" % "2.0-RC2"
 )
