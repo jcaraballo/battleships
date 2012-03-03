@@ -7,20 +7,20 @@ import ShipLocationMultiplyPlacer.findAllShipLocations
 
 object FleetLocationMultiplyPlacer {
   def findAllValidLocations(shipSizes: List[Int], available: Set[Position]): Set[FleetLocation] = {
-    recursiveFindAllValidLocations(shipSizes, Set((new FleetLocation(Set()), available)))
+    recursiveFindAllValidLocations(shipSizes, Set(FleetConfiguration(available)))
   }
 
-  private def recursiveFindAllValidLocations(shipSizes: List[Int], fleetAndAvailablePositionsPairs: Set[(FleetLocation, Set[Position])]): Set[FleetLocation] = {
+  private def recursiveFindAllValidLocations(shipSizes: List[Int], fleetAndAvailablePositionsPairs: Set[FleetConfiguration]): Set[FleetLocation] = {
     shipSizes match {
       case nextShipSize :: restShipSizes => {
-        fleetAndAvailablePositionsPairs.flatMap(((fleet: FleetLocation, available: Set[Position]) => {
-          val newFleetAndAvailablePositionsPairs: Set[(FleetLocation, Set[Position])] = findAllShipLocations(nextShipSize, available).map {
-            (possibleLocation: ShipLocation) => (fleet + possibleLocation, available -- possibleLocation.squares)
+        fleetAndAvailablePositionsPairs.flatMap((fleetConfiguration: FleetConfiguration) => {
+          val newFleetConfigurations: Set[FleetConfiguration] = findAllShipLocations(nextShipSize, fleetConfiguration.available).map {
+            (possibleLocation: ShipLocation) => new FleetConfiguration(fleetConfiguration.fleet + possibleLocation, fleetConfiguration.available -- possibleLocation.squares)
           }
-          recursiveFindAllValidLocations(restShipSizes, newFleetAndAvailablePositionsPairs)
-        }).tupled)
+          recursiveFindAllValidLocations(restShipSizes, newFleetConfigurations)
+        })
       }
-      case empty => fleetAndAvailablePositionsPairs.map(_._1)
+      case empty => fleetAndAvailablePositionsPairs.map(_.fleet)
     }
   }
 }

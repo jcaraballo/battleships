@@ -26,7 +26,7 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
     case Request(shipSizes, available) => {
       log.info("Entered Request(" + shipSizes + ", " + available + ")")
       try {
-        val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(shipSizes, Set((new FleetLocation(Set()), available)))
+        val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(shipSizes, Set(FleetConfiguration(available)))
         sender ! Await.result(future, duration).asInstanceOf[GenericResponse]
       }
       catch {
@@ -37,33 +37,33 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
       }
     }
 
-    case SelfRequest(shipSizes, validFleetWithWhatLeavesAvailable) => {
-      log.info("Entered SelfRequest(" + shipSizes + ", " + validFleetWithWhatLeavesAvailable + ")")
+    case SelfRequest(shipSizes, fleetConfigurations) => {
+      log.info("Entered SelfRequest(" + shipSizes + ", " + fleetConfigurations + ")")
       try {
         shipSizes match {
           case nextShipSize :: restShipSizes => {
-            val t: (FleetLocation, Set[Position]) => Set[FleetLocation] = (fleet: FleetLocation, available: Set[Position]) => {
-              val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(nextShipSize, available)
+            val t: FleetConfiguration => Set[FleetLocation] = (fleetConfiguration: FleetConfiguration) => {
+              val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(nextShipSize, fleetConfiguration.available)
               val result = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
-              val lol: Set[(FleetLocation, Set[Position])] = result.allShipLocations.map {
-                (possibleLocation: ShipLocation) => (fleet + possibleLocation, available -- possibleLocation.squares)
+              val newFleetConfigurations: Set[FleetConfiguration] = result.allShipLocations.map {
+                (possibleLocation: ShipLocation) => new FleetConfiguration(fleetConfiguration.fleet + possibleLocation, fleetConfiguration.available -- possibleLocation.squares)
               }
 
-              val future1 = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(restShipSizes, lol)
-              Await.result(future1, duration) match {
+              val allFleetsFuture = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(restShipSizes, newFleetConfigurations)
+              Await.result(allFleetsFuture, duration) match {
                 case response: Response => response.allFleetLocations
                 case exceptional: ExceptionalResponse => sender ! exceptional; Set() //should kill myself
                 case e => log.error("Unexpected"); throw new IllegalArgumentException
               }
             }
-            sender ! Response(validFleetWithWhatLeavesAvailable.flatMap(t.tupled))
+            sender ! Response(fleetConfigurations.flatMap(t))
           }
-          case empty => sender ! Response(validFleetWithWhatLeavesAvailable.map(_._1))
+          case empty => sender ! Response(fleetConfigurations.map(_.fleet))
         }
       }
       catch {
         case e => {
-          log.info("While processing SelfRequest("  + shipSizes + ", " + validFleetWithWhatLeavesAvailable + ") exception was thrown, sending back wrapped in ExceptionalReponse: " + e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
+          log.info("While processing SelfRequest("  + shipSizes + ", " + fleetConfigurations + ") exception was thrown, sending back wrapped in ExceptionalReponse: " + e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
           sender ! ExceptionalResponse(e)
         }
       }
@@ -74,7 +74,7 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
 object FleetLocationMultiplyPlacerActor {
 
   case class Request(shipSizes: List[Int], available: Set[Position])
-  case class SelfRequest(shipSizes: List[Int], validFleetWithWhatLeavesAvailable: Set[(FleetLocation, Set[Position])])
+  case class SelfRequest(shipSizes: List[Int], fleetConfigurations: Set[FleetConfiguration])
 
   case class GenericResponse()
   case class Response(allFleetLocations: Set[FleetLocation]) extends GenericResponse
