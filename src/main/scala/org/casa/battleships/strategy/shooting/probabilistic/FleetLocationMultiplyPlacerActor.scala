@@ -46,7 +46,7 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
               val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(nextShipSize, fleetConfiguration.availability)
               val result = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
               val newFleetConfigurations: Set[FleetConfiguration] = result.allShipLocations.map {
-                (possibleLocation: ShipLocation) => new FleetConfiguration(fleetConfiguration.fleet + possibleLocation, fleetConfiguration.availability -- possibleLocation.squares)
+                (possibleLocation: ShipLocation) => fleetConfiguration + possibleLocation
               }
 
               val allFleetsFuture = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(restShipSizes, newFleetConfigurations)

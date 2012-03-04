@@ -13,14 +13,9 @@ object FleetLocationMultiplyPlacer {
   private def recursiveFindAllValidLocations(shipSizes: List[Int], configurations: Set[FleetConfiguration]): Set[FleetLocation] = {
     shipSizes match {
       case nextShipSize :: restShipSizes => {
-        val newConfigurations: Set[FleetConfiguration] = configurations.flatMap((fleetConfiguration: FleetConfiguration) => {
-          val allPossibleLocationsForNextShip: Set[ShipLocation] = findAllShipLocations(nextShipSize, fleetConfiguration.availability)
-          allPossibleLocationsForNextShip.map {
-            (possibleLocation: ShipLocation) => new FleetConfiguration(
-              fleetConfiguration.fleet + possibleLocation,
-              fleetConfiguration.availability -- possibleLocation.squares
-            )
-          }
+        val newConfigurations: Set[FleetConfiguration] = configurations.flatMap(fleetConfiguration => {
+          val allPossibleLocationsForNextShip = findAllShipLocations(nextShipSize, fleetConfiguration.availability)
+          allPossibleLocationsForNextShip.map { possibleLocation => fleetConfiguration + possibleLocation }
         })
 
         recursiveFindAllValidLocations(restShipSizes, newConfigurations)
