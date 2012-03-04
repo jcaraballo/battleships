@@ -7,10 +7,10 @@ import org.casa.battleships.strategy.shooting.probabilistic.ShipLocationMultiply
 
 class ShipLocationMultiplyPlacerActor extends Actor{
   def receive = {
-    case Request(shipSize, available) => sender ! Response(ShipLocationMultiplyPlacer.findAllShipLocations(shipSize, available))
+    case Request(fleetConfiguration, shipSize) => sender ! Response(ShipLocationMultiplyPlacer.findAllShipLocations(shipSize, fleetConfiguration.availability))
   }
 }
 object ShipLocationMultiplyPlacerActor{
-  case class Request(shipSize: Int, availability: Set[Position])
+  case class Request(fleetConfiguration: FleetConfiguration, shipSize: Int)
   case class Response(allShipLocations: Set[ShipLocation])
 }

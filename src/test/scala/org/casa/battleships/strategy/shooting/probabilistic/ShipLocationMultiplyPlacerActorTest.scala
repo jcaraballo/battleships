@@ -66,7 +66,7 @@ class ShipLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterEa
   var shipPlacer: ActorRef = _
 
   private def findThemAll(shipSize: Int, availability: Set[Position]): Set[ShipLocation] = {
-    val future = shipPlacer.ask(ShipLocationMultiplyPlacerActor.Request(shipSize, availability))
+    val future = shipPlacer.ask(ShipLocationMultiplyPlacerActor.Request(FleetConfiguration(availability), shipSize))
     val response = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
 
     response.allShipLocations

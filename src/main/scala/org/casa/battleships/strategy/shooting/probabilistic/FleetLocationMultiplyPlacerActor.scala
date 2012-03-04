@@ -43,7 +43,7 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
         shipSizes match {
           case nextShipSize :: restShipSizes => {
             val t: FleetConfiguration => Set[FleetLocation] = (fleetConfiguration: FleetConfiguration) => {
-              val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(nextShipSize, fleetConfiguration.availability)
+              val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(fleetConfiguration, nextShipSize)
               val result = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
               val newFleetConfigurations: Set[FleetConfiguration] = result.allShipLocations.map {
                 (possibleLocation: ShipLocation) => fleetConfiguration + possibleLocation
