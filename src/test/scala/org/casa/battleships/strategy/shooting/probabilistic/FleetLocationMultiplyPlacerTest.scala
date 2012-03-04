@@ -9,8 +9,12 @@ import org.casa.battleships.Positions
 import org.casa.battleships.fleet.{ShipLocation, FleetLocation}
 import testtools.fixtures.Builders.createHistoryOfWater
 import testtools.fixtures.Examples.someFleetConfiguration
+import testtools.Stopwatch.time
+import org.scalatest.matchers.ShouldMatchers
+import grizzled.slf4j.Logger
 
-class FleetLocationMultiplyPlacerTest extends FunSuite {
+class FleetLocationMultiplyPlacerTest extends FunSuite with ShouldMatchers{
+  val logger = Logger(classOf[FleetLocationMultiplyPlacerTest])
 
   test("No possible location when no available space") {
     assertThat(findAllValidLocations(someFleetConfiguration, Set()), is(Set[FleetLocation]()))
@@ -33,6 +37,12 @@ class FleetLocationMultiplyPlacerTest extends FunSuite {
     assertThat(findAllValidLocations(2 :: 2 :: Nil, Positions.createGrid(2)), is(Set(
       new FleetLocation(horizontalShips), new FleetLocation(verticalShips)
     )))
+  }
+
+  test("All possible fleets for 3 ships in a 6x6 grid are calculated in less than 4.2 seconds") {
+    val timeItTook: Long = time(findAllValidLocations(3 :: 3 :: 2 :: Nil, Positions.createGrid(6)))._2
+    logger.info("It took " + timeItTook + "ms")
+    timeItTook should be < (2100L * 2)
   }
 
   test("Finds unique fleet when there is only one place where it fits"){
