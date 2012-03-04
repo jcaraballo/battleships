@@ -69,7 +69,7 @@ class ShipLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterEa
     val future = shipPlacer.ask(ShipLocationMultiplyPlacerActor.Request(FleetConfiguration(availability), shipSize))
     val response = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
 
-    response.allShipLocations
+    response.allFleetConfigurations.map(configuration => configuration.fleet.shipLocations.head)
   }
 
   override def beforeEach() {

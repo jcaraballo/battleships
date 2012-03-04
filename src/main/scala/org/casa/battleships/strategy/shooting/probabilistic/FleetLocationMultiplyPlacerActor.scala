@@ -2,14 +2,12 @@ package org.casa.battleships.strategy.shooting.probabilistic
 
 import org.casa.battleships.Position
 import collection.immutable.Set
-import org.casa.battleships.fleet.{ShipLocation, FleetLocation}
+import org.casa.battleships.fleet.FleetLocation
 import akka.pattern.ask
 import akka.dispatch.Await
 import akka.util.duration._
-import akka.util.{FiniteDuration, Timeout}
 import FleetLocationMultiplyPlacerActor._
 import akka.actor.{ActorRef, Props, Actor}
-import java.util.concurrent.TimeoutException
 import akka.event.Logging
 import akka.util.{Duration, Timeout}
 
@@ -45,11 +43,8 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
             val t: FleetConfiguration => Set[FleetLocation] = (fleetConfiguration: FleetConfiguration) => {
               val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(fleetConfiguration, nextShipSize)
               val result = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
-              val newFleetConfigurations: Set[FleetConfiguration] = result.allShipLocations.map {
-                (possibleLocation: ShipLocation) => fleetConfiguration + possibleLocation
-              }
-
-              val allFleetsFuture = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(restShipSizes, newFleetConfigurations)
+              val clone = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor)))
+              val allFleetsFuture = clone ? SelfRequest(restShipSizes, result.allFleetConfigurations)
               Await.result(allFleetsFuture, duration) match {
                 case response: Response => response.allFleetLocations
                 case exceptional: ExceptionalResponse => sender ! exceptional; Set() //should kill myself
