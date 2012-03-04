@@ -8,20 +8,20 @@ import org.casa.battleships.fleet.ShipLocation
 
 class ShipLocationChooser(chooser: PositionChooser) {
   @tailrec
-  final def place(shipSize: Int, available: Set[Position]): Option[ShipLocation] = {
-    chooser.choose(available) match {
+  final def place(shipSize: Int, availability: Set[Position]): Option[ShipLocation] = {
+    chooser.choose(availability) match {
       case None => None
       case Some(candidate) => {
-        val possibleContinuations: Set[Position] = neighbours(candidate) & available
-        placeShip(shipSize, available, Set(candidate), possibleContinuations) match {
-          case None => place(shipSize, available - candidate)
+        val possibleContinuations: Set[Position] = neighbours(candidate) & availability
+        placeShip(shipSize, availability, Set(candidate), possibleContinuations) match {
+          case None => place(shipSize, availability - candidate)
           case e => e
         }
       }
     }
   }
 
-  def placeShip(shipSize: Int, available: Set[Position], chosen: Set[Position], possibleContinuations: Set[Position]): Option[ShipLocation] = {
+  def placeShip(shipSize: Int, availability: Set[Position], chosen: Set[Position], possibleContinuations: Set[Position]): Option[ShipLocation] = {
     if (chosen.size == shipSize) {
       Some(new ShipLocation(chosen))
     } else {
@@ -29,15 +29,15 @@ class ShipLocationChooser(chooser: PositionChooser) {
         case None => None
         case Some(chosenContinuation) => {
           val newChosen: Set[Position] = chosen + chosenContinuation
-          val newAvailable: Set[Position] = available - chosenContinuation
+          val newAvailability: Set[Position] = availability - chosenContinuation
           val placement: Option[ShipLocation] = placeShip(
             shipSize,
-            newAvailable,
+            newAvailability,
             newChosen,
-            ShipLocationChooser.calculatePossibleContinuations(newChosen) & newAvailable
+            ShipLocationChooser.calculatePossibleContinuations(newChosen) & newAvailability
           )
           placement match {
-            case None => placeShip(shipSize, available, chosen, possibleContinuations - chosenContinuation)
+            case None => placeShip(shipSize, availability, chosen, possibleContinuations - chosenContinuation)
             case e => e
           }
         }

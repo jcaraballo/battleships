@@ -43,10 +43,10 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
         shipSizes match {
           case nextShipSize :: restShipSizes => {
             val t: FleetConfiguration => Set[FleetLocation] = (fleetConfiguration: FleetConfiguration) => {
-              val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(nextShipSize, fleetConfiguration.available)
+              val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(nextShipSize, fleetConfiguration.availability)
               val result = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
               val newFleetConfigurations: Set[FleetConfiguration] = result.allShipLocations.map {
-                (possibleLocation: ShipLocation) => new FleetConfiguration(fleetConfiguration.fleet + possibleLocation, fleetConfiguration.available -- possibleLocation.squares)
+                (possibleLocation: ShipLocation) => new FleetConfiguration(fleetConfiguration.fleet + possibleLocation, fleetConfiguration.availability -- possibleLocation.squares)
               }
 
               val allFleetsFuture = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(restShipSizes, newFleetConfigurations)
@@ -73,7 +73,7 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
 
 object FleetLocationMultiplyPlacerActor {
 
-  case class Request(shipSizes: List[Int], available: Set[Position])
+  case class Request(shipSizes: List[Int], availability: Set[Position])
   case class SelfRequest(shipSizes: List[Int], fleetConfigurations: Set[FleetConfiguration])
 
   case class GenericResponse()

@@ -6,19 +6,19 @@ import org.casa.battleships.fleet.{ShipLocation, FleetLocation}
 import ShipLocationMultiplyPlacer.findAllShipLocations
 
 object FleetLocationMultiplyPlacer {
-  def findAllValidLocations(shipSizes: List[Int], available: Set[Position]): Set[FleetLocation] = {
-    recursiveFindAllValidLocations(shipSizes, Set(FleetConfiguration(available)))
+  def findAllValidLocations(shipSizes: List[Int], availability: Set[Position]): Set[FleetLocation] = {
+    recursiveFindAllValidLocations(shipSizes, Set(FleetConfiguration(availability)))
   }
 
   private def recursiveFindAllValidLocations(shipSizes: List[Int], configurations: Set[FleetConfiguration]): Set[FleetLocation] = {
     shipSizes match {
       case nextShipSize :: restShipSizes => {
         val newConfigurations: Set[FleetConfiguration] = configurations.flatMap((fleetConfiguration: FleetConfiguration) => {
-          val allPossibleLocationsForNextShip: Set[ShipLocation] = findAllShipLocations(nextShipSize, fleetConfiguration.available)
+          val allPossibleLocationsForNextShip: Set[ShipLocation] = findAllShipLocations(nextShipSize, fleetConfiguration.availability)
           allPossibleLocationsForNextShip.map {
             (possibleLocation: ShipLocation) => new FleetConfiguration(
               fleetConfiguration.fleet + possibleLocation,
-              fleetConfiguration.available -- possibleLocation.squares
+              fleetConfiguration.availability -- possibleLocation.squares
             )
           }
         })

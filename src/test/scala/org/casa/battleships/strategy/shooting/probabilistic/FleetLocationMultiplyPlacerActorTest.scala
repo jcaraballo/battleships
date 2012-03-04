@@ -85,8 +85,8 @@ class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterE
   var shipsPlacer: ActorRef = _
   var fleetPlacer: ActorRef = _
 
-  private def findThemAll(shipSizes: List[Int], available: Set[Position]): Set[FleetLocation] = {
-    val future = fleetPlacer.ask(FleetLocationMultiplyPlacerActor.Request(shipSizes, available))
+  private def findThemAll(shipSizes: List[Int], availability: Set[Position]): Set[FleetLocation] = {
+    val future = fleetPlacer.ask(FleetLocationMultiplyPlacerActor.Request(shipSizes, availability))
     Await.result(future, duration) match {
       case response: FleetLocationMultiplyPlacerActor.Response => response.allFleetLocations
 

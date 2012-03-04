@@ -11,6 +11,6 @@ class ShipLocationMultiplyPlacerActor extends Actor{
   }
 }
 object ShipLocationMultiplyPlacerActor{
-  case class Request(shipSize: Int, available: Set[Position])
+  case class Request(shipSize: Int, availability: Set[Position])
   case class Response(allShipLocations: Set[ShipLocation])
 }
