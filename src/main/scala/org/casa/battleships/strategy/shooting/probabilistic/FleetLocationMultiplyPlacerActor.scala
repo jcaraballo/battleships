@@ -11,7 +11,7 @@ import akka.actor.{ActorRef, Props, Actor}
 import akka.event.Logging
 import akka.util.{Duration, Timeout}
 
-class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor {
+class FleetLocationMultiplyPlacerActor(workerActor: ActorRef) extends Actor {
 
   import context._
 
@@ -24,7 +24,7 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
     case Request(shipSizes, available) => {
       log.info("Entered Request(" + shipSizes + ", " + available + ")")
       try {
-        val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor))) ? SelfRequest(shipSizes, Set(FleetConfiguration(available)))
+        val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(workerActor))) ? SelfRequest(shipSizes, Set(FleetConfiguration(available)))
         sender ! Await.result(future, duration).asInstanceOf[GenericResponse]
       }
       catch {
@@ -41,9 +41,9 @@ class FleetLocationMultiplyPlacerActor(shipsPlacerActor: ActorRef) extends Actor
         shipSizes match {
           case nextShipSize :: restShipSizes => {
             val t: FleetConfiguration => Set[FleetLocation] = (fleetConfiguration: FleetConfiguration) => {
-              val future = shipsPlacerActor ? ShipLocationMultiplyPlacerActor.Request(fleetConfiguration, nextShipSize)
-              val result = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
-              val clone = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacerActor)))
+              val future = workerActor ? WorkerActor.Request(fleetConfiguration, nextShipSize)
+              val result = Await.result(future, duration).asInstanceOf[WorkerActor.Response]
+              val clone = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(workerActor)))
               val allFleetsFuture = clone ? SelfRequest(restShipSizes, result.allFleetConfigurations)
               Await.result(allFleetsFuture, duration) match {
                 case response: Response => response.allFleetLocations

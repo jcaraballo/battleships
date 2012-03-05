@@ -15,7 +15,7 @@ import org.casa.battleships.fleet.ShipLocation
 import org.casa.battleships.Positions._
 import collection.immutable.Set
 
-class ShipLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterEach {
+class WorkerActorTest extends FunSuite with BeforeAndAfterEach {
 
   test("No possible placement when no free space") {
     assertThat(findThemAll(2, Set[Position]()), isEmpty)
@@ -66,15 +66,15 @@ class ShipLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterEa
   var shipPlacer: ActorRef = _
 
   private def findThemAll(shipSize: Int, availability: Set[Position]): Set[ShipLocation] = {
-    val future = shipPlacer.ask(ShipLocationMultiplyPlacerActor.Request(FleetConfiguration(availability), shipSize))
-    val response = Await.result(future, duration).asInstanceOf[ShipLocationMultiplyPlacerActor.Response]
+    val future = shipPlacer.ask(WorkerActor.Request(FleetConfiguration(availability), shipSize))
+    val response = Await.result(future, duration).asInstanceOf[WorkerActor.Response]
 
     response.allFleetConfigurations.map(configuration => configuration.fleet.shipLocations.head)
   }
 
   override def beforeEach() {
     actorSystem = ActorSystem("MySystem")
-    shipPlacer = actorSystem.actorOf(Props[ShipLocationMultiplyPlacerActor], name = "ship_placer")
+    shipPlacer = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer())), name = "ship_placer")
 
   }
 

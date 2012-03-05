@@ -100,7 +100,7 @@ class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterE
 
   override def beforeEach() {
     actorSystem = ActorSystem("MySystem")
-    shipsPlacer = actorSystem.actorOf(Props[ShipLocationMultiplyPlacerActor])
+    shipsPlacer = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
     fleetPlacer = actorSystem.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacer)), name = "fleet_placer")
 
   }
