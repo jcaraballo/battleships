@@ -63,10 +63,10 @@ class WorkerActorTest extends FunSuite with BeforeAndAfterEach {
   val duration: Duration = 1 second
   implicit val timeout = Timeout(duration)
   var actorSystem: ActorSystem = _
-  var shipPlacer: ActorRef = _
+  var worker: ActorRef = _
 
   private def findThemAll(shipSize: Int, availability: Set[Position]): Set[ShipLocation] = {
-    val future = shipPlacer.ask(WorkerActor.Request(FleetConfiguration(availability), shipSize))
+    val future = worker.ask(WorkerActor.Request(FleetConfiguration(availability), shipSize))
     val response = Await.result(future, duration).asInstanceOf[WorkerActor.Response]
 
     response.allFleetConfigurations.map(configuration => configuration.fleet.shipLocations.head)
@@ -74,7 +74,7 @@ class WorkerActorTest extends FunSuite with BeforeAndAfterEach {
 
   override def beforeEach() {
     actorSystem = ActorSystem("MySystem")
-    shipPlacer = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer())), name = "ship_placer")
+    worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer())), name = "worker")
 
   }
 
