@@ -15,7 +15,6 @@ import org.casa.battleships.fleet.{FleetLocation, ShipLocation}
 import org.casa.battleships.{Positions, Position}
 import testtools.fixtures.Builders._
 import testtools.fixtures.Examples
-import org.hamcrest.CoreMatchers
 import java.util.concurrent.TimeoutException
 
 class MasterActorTest extends FunSuite with BeforeAndAfterEach {
@@ -69,7 +68,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("Times out when request takes longer than time out"){
-    val future = fleetPlacer.ask(MasterActor.Request(Examples.classicFleetConfiguration, Positions.createGrid(10)))
+    val future = master.ask(MasterActor.Request(Examples.classicFleetConfiguration, Positions.createGrid(10)))
     try {
       Await.result(future, 1 milli)
       fail("Should throw a TimeoutException")
@@ -82,11 +81,11 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach {
   val duration: Duration = 1 second
   implicit val timeout = Timeout(duration)
   var actorSystem: ActorSystem = _
-  var shipsPlacer: ActorRef = _
-  var fleetPlacer: ActorRef = _
+  var worker: ActorRef = _
+  var master: ActorRef = _
 
   private def findThemAll(shipSizes: List[Int], availability: Set[Position]): Set[FleetLocation] = {
-    val future = fleetPlacer.ask(MasterActor.Request(shipSizes, availability))
+    val future = master.ask(MasterActor.Request(shipSizes, availability))
     Await.result(future, duration) match {
       case response: MasterActor.Response => response.allFleetLocations
 
@@ -100,8 +99,8 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach {
 
   override def beforeEach() {
     actorSystem = ActorSystem("MySystem")
-    shipsPlacer = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
-    fleetPlacer = actorSystem.actorOf(Props(new MasterActor(shipsPlacer)), name = "fleet_placer")
+    worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
+    master = actorSystem.actorOf(Props(new MasterActor(worker)), name = "fleet_placer")
 
   }
 
