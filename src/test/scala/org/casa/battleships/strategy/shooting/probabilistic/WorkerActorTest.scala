@@ -1,8 +1,5 @@
 package org.casa.battleships.strategy.shooting.probabilistic
 
-import org.junit.Assert._
-import org.casa.battleships.Position
-import testtools.Matchers._
 import akka.util.duration._
 import akka.dispatch.Await
 import akka.pattern.ask
@@ -10,72 +7,48 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import akka.util.{Duration, Timeout}
 import akka.actor.{ActorRef, Props, ActorSystem}
 import org.casa.battleships.Position._
-import org.hamcrest.CoreMatchers._
-import org.casa.battleships.fleet.ShipLocation
 import org.casa.battleships.Positions._
 import collection.immutable.Set
+import org.mockito.Mockito._
+import org.casa.battleships.fleet.ShipLocation
+import org.scalatest.matchers.ShouldMatchers
 
-class WorkerActorTest extends FunSuite with BeforeAndAfterEach {
-
-  test("No possible placement when no free space") {
-    assertThat(findThemAll(2, Set[Position]()), isEmpty)
-  }
-
-  test("One possible placement when one place where it fits") {
-    assertThat(findThemAll(2, Set(pos(1, 1), pos(2, 1))), is(Set(new ShipLocation(pos(1, 1), pos(2, 1)))))
-  }
-
-  test("All possible locations for 2 square ship in 2x2 grid") {
-    assertThat(findThemAll(2, createGrid(2)), is(Set(
-
-      //horizontal locations
-      new ShipLocation(pos(1, 1), pos(2, 1)),
-      new ShipLocation(pos(1, 2), pos(2, 2)),
-
-      //verticals locations
-      new ShipLocation(pos(1, 1), pos(1, 2)),
-      new ShipLocation(pos(2, 1), pos(2, 2))
-
-    )))
-  }
-
-  test("All possible locations for 2 square ship in 3x3 grid") {
-    assertThat(findThemAll(2, createGrid(3)), is(Set(
-
-      //horizontal locations
-      new ShipLocation(pos(1, 1), pos(2, 1)),
-      new ShipLocation(pos(2, 1), pos(3, 1)),
-      new ShipLocation(pos(1, 2), pos(2, 2)),
-      new ShipLocation(pos(2, 2), pos(3, 2)),
-      new ShipLocation(pos(1, 3), pos(2, 3)),
-      new ShipLocation(pos(2, 3), pos(3, 3)),
-
-      //verticals locations
-      new ShipLocation(pos(1, 1), pos(1, 2)),
-      new ShipLocation(pos(1, 2), pos(1, 3)),
-      new ShipLocation(pos(2, 1), pos(2, 2)),
-      new ShipLocation(pos(2, 2), pos(2, 3)),
-      new ShipLocation(pos(3, 1), pos(3, 2)),
-      new ShipLocation(pos(3, 2), pos(3, 3))
-    )))
-  }
-
+class WorkerActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
   val duration: Duration = 1 second
   implicit val timeout = Timeout(duration)
   var actorSystem: ActorSystem = _
   var worker: ActorRef = _
 
-  private def findThemAll(shipSize: Int, availability: Set[Position]): Set[ShipLocation] = {
-    val future = worker.ask(WorkerActor.Request(FleetConfiguration(availability), shipSize))
+  val shipPlacer = mock(classOf[ShipLocationMultiplyPlacer])
+
+  test("Delegates to ShipLocationMultiplyPlacer") {
+    val shipLocation1 = new ShipLocation(pos(1, 1), pos(5, 1))
+    val shipLocation2 = new ShipLocation(pos(6, 3), pos(8, 3))
+    val shipLocations = Set(shipLocation1, shipLocation2)
+    val availability = createGrid(10)
+
+    when(shipPlacer.findAllShipLocations(2, availability)).thenReturn(shipLocations)
+
+    val fleetConfiguration = mock(classOf[FleetConfiguration])
+    val fleetConfiguration_plusShipLocation1 = mock(classOf[FleetConfiguration])
+    val fleetConfiguration_plusShipLocation2 = mock(classOf[FleetConfiguration])
+
+    when(fleetConfiguration.availability).thenReturn(availability)
+    when(fleetConfiguration + shipLocation1).thenReturn(fleetConfiguration_plusShipLocation1)
+    when(fleetConfiguration + shipLocation2).thenReturn(fleetConfiguration_plusShipLocation2)
+
+    val future = worker.ask(WorkerActor.Request(fleetConfiguration, 2))
     val response = Await.result(future, duration).asInstanceOf[WorkerActor.Response]
 
-    response.allFleetConfigurations.map(configuration => configuration.fleet.shipLocations.head)
+    response.allFleetConfigurations should equal(Set(
+      fleetConfiguration_plusShipLocation1,
+      fleetConfiguration_plusShipLocation2
+    ))
   }
 
   override def beforeEach() {
     actorSystem = ActorSystem("MySystem")
-    worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer())), name = "worker")
-
+    worker = actorSystem.actorOf(Props(new WorkerActor(shipPlacer)), name = "worker")
   }
 
   override def afterEach() {
