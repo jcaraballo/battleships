@@ -6,12 +6,12 @@ import org.casa.battleships.fleet.FleetLocation
 import akka.pattern.ask
 import akka.dispatch.Await
 import akka.util.duration._
-import FleetLocationMultiplyPlacerActor._
+import MasterActor._
 import akka.actor.{ActorRef, Props, Actor}
 import akka.event.Logging
 import akka.util.{Duration, Timeout}
 
-class FleetLocationMultiplyPlacerActor(workerActor: ActorRef) extends Actor {
+class MasterActor(workerActor: ActorRef) extends Actor {
 
   import context._
 
@@ -24,7 +24,7 @@ class FleetLocationMultiplyPlacerActor(workerActor: ActorRef) extends Actor {
     case Request(shipSizes, available) => {
       log.info("Entered Request(" + shipSizes + ", " + available + ")")
       try {
-        val future = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(workerActor))) ? SelfRequest(shipSizes, Set(FleetConfiguration(available)))
+        val future = context.actorOf(Props(new MasterActor(workerActor))) ? SelfRequest(shipSizes, Set(FleetConfiguration(available)))
         sender ! Await.result(future, duration).asInstanceOf[GenericResponse]
       }
       catch {
@@ -43,7 +43,7 @@ class FleetLocationMultiplyPlacerActor(workerActor: ActorRef) extends Actor {
             val t: FleetConfiguration => Set[FleetLocation] = (fleetConfiguration: FleetConfiguration) => {
               val future = workerActor ? WorkerActor.Request(fleetConfiguration, nextShipSize)
               val result = Await.result(future, duration).asInstanceOf[WorkerActor.Response]
-              val clone = context.actorOf(Props(new FleetLocationMultiplyPlacerActor(workerActor)))
+              val clone = context.actorOf(Props(new MasterActor(workerActor)))
               val allFleetsFuture = clone ? SelfRequest(restShipSizes, result.allFleetConfigurations)
               Await.result(allFleetsFuture, duration) match {
                 case response: Response => response.allFleetLocations
@@ -66,7 +66,7 @@ class FleetLocationMultiplyPlacerActor(workerActor: ActorRef) extends Actor {
   }
 }
 
-object FleetLocationMultiplyPlacerActor {
+object MasterActor {
 
   case class Request(shipSizes: List[Int], availability: Set[Position])
   case class SelfRequest(shipSizes: List[Int], fleetConfigurations: Set[FleetConfiguration])

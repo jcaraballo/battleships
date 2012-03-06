@@ -18,7 +18,7 @@ import testtools.fixtures.Examples
 import org.hamcrest.CoreMatchers
 import java.util.concurrent.TimeoutException
 
-class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterEach {
+class MasterActorTest extends FunSuite with BeforeAndAfterEach {
 
   test("No possible location when no available space") {
     assertThat(findThemAll(someFleetConfiguration, Set()), is(Set[FleetLocation]()))
@@ -69,7 +69,7 @@ class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterE
   }
 
   test("Times out when request takes longer than time out"){
-    val future = fleetPlacer.ask(FleetLocationMultiplyPlacerActor.Request(Examples.classicFleetConfiguration, Positions.createGrid(10)))
+    val future = fleetPlacer.ask(MasterActor.Request(Examples.classicFleetConfiguration, Positions.createGrid(10)))
     try {
       Await.result(future, 1 milli)
       fail("Should throw a TimeoutException")
@@ -86,11 +86,11 @@ class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterE
   var fleetPlacer: ActorRef = _
 
   private def findThemAll(shipSizes: List[Int], availability: Set[Position]): Set[FleetLocation] = {
-    val future = fleetPlacer.ask(FleetLocationMultiplyPlacerActor.Request(shipSizes, availability))
+    val future = fleetPlacer.ask(MasterActor.Request(shipSizes, availability))
     Await.result(future, duration) match {
-      case response: FleetLocationMultiplyPlacerActor.Response => response.allFleetLocations
+      case response: MasterActor.Response => response.allFleetLocations
 
-      case exceptionalResponse: FleetLocationMultiplyPlacerActor.ExceptionalResponse => {
+      case exceptionalResponse: MasterActor.ExceptionalResponse => {
         throw new RuntimeException("Got ExceptionalResponse back", exceptionalResponse.exception)
       }
 
@@ -101,7 +101,7 @@ class FleetLocationMultiplyPlacerActorTest extends FunSuite with BeforeAndAfterE
   override def beforeEach() {
     actorSystem = ActorSystem("MySystem")
     shipsPlacer = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
-    fleetPlacer = actorSystem.actorOf(Props(new FleetLocationMultiplyPlacerActor(shipsPlacer)), name = "fleet_placer")
+    fleetPlacer = actorSystem.actorOf(Props(new MasterActor(shipsPlacer)), name = "fleet_placer")
 
   }
 
