@@ -2,7 +2,6 @@ package org.casa.battleships.strategy.shooting.probabilistic
 
 import org.junit.Assert._
 import akka.util.duration._
-import akka.dispatch.Await
 import akka.pattern.ask
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import akka.util.{Duration, Timeout}
@@ -12,14 +11,40 @@ import collection.immutable.Set
 import testtools.fixtures.Examples._
 import org.casa.battleships.fleet.{FleetLocation, ShipLocation}
 import org.casa.battleships.{Positions, Position}
+import org.casa.battleships.Positions.createGrid
 import testtools.fixtures.Builders._
 import testtools.fixtures.Examples
 import java.util.concurrent.TimeoutException
 import akka.actor.{Actor, ActorRef, Props, ActorSystem}
 import grizzled.slf4j.Logger
+import akka.dispatch.{Future, Await}
+import org.scalatest.matchers.ShouldMatchers
 
-class MasterActorTest extends FunSuite with BeforeAndAfterEach {
+class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
   val logger = Logger(classOf[MasterActorTest])
+
+  val fleetLocation1 = FleetLocation(Set(ShipLocation(Set(pos(1, 2), pos(2, 2)))))
+  val fleetLocation2 = FleetLocation(Set(ShipLocation(Set(pos(4, 2), pos(4, 2)))))
+  val fleetConfiguration = FleetConfiguration(createGrid(10))
+  val someAvailability = Set(pos(9, 9))
+  val someOtherAvailability = Set(pos(10, 10))
+
+  test("Given one fleet conf and one ship size, delegates to worker and returns a location per returned conf"){
+    val configurationsToBeReturnedByTheMock = Set(
+      FleetConfiguration(fleetLocation1, someAvailability),
+      FleetConfiguration(fleetLocation2, someOtherAvailability)
+    )
+    val fakeWorker = mockWorkerActor(fleetConfiguration, configurationsToBeReturnedByTheMock)
+
+    master = actorSystem.actorOf(Props(new MasterActor(fakeWorker)), name = "master")
+
+    val future: Future[Any] = master ? MasterActor.SelfRequest(2 :: Nil, Set(fleetConfiguration))
+    Await.result(future, duration) match {
+      case response: MasterActor.Response => response should equal (MasterActor.Response(Set(fleetLocation1, fleetLocation2)))
+
+      case unexpected => throw new IllegalStateException("Got unexpected response back" + unexpected)
+    }
+  }  
 
   test("No possible location when no available space") {
     assertThat(findThemAll(someListOfShipSizes, Set()), is(Set[FleetLocation]()))
@@ -104,5 +129,14 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach {
 
   override def afterEach() {
     actorSystem.shutdown
+  }
+
+  private def mockWorkerActor(expected: FleetConfiguration, toBeReplied: Set[FleetConfiguration]): ActorRef = {
+    actorSystem.actorOf(Props(new Actor() {
+      protected def receive = {
+        case WorkerActor.Request(fc, 2) if expected == fc => sender ! WorkerActor.Response(toBeReplied)
+        case somethingElse => sender ! akka.actor.Status.Failure(new AssertionError("Unexpected request: " + somethingElse))
+      }
+    }))
   }
 }
