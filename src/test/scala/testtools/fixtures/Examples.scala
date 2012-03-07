@@ -13,8 +13,8 @@ object Examples {
       immaculateShip(pos(1, 5), pos(2, 5))
     )
 
-  def classicFleetConfiguration = List(5, 4, 3, 3, 2)
-  def someFleetConfiguration = classicFleetConfiguration
+  def classicListOfShipSizes = List(5, 4, 3, 3, 2)
+  def someListOfShipSizes = classicListOfShipSizes
 
   def somePosition = pos(1, 1)
 }

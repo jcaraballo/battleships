@@ -7,7 +7,7 @@ import org.casa.battleships.Position._
 import org.casa.battleships.Positions
 import org.casa.battleships.fleet.{ShipLocation, FleetLocation}
 import testtools.fixtures.Builders.createHistoryOfWater
-import testtools.fixtures.Examples.someFleetConfiguration
+import testtools.fixtures.Examples.someListOfShipSizes
 import testtools.Stopwatch.time
 import org.scalatest.matchers.ShouldMatchers
 import grizzled.slf4j.Logger
@@ -18,7 +18,7 @@ class FleetLocationMultiplyPlacerTest extends FunSuite with ShouldMatchers{
   val placer = new FleetLocationMultiplyPlacer(new ShipLocationMultiplyPlacer)
 
   test("No possible location when no available space") {
-    assertThat(placer.findAllValidLocations(someFleetConfiguration, Set()), is(Set[FleetLocation]()))
+    assertThat(placer.findAllValidLocations(someListOfShipSizes, Set()), is(Set[FleetLocation]()))
   }
 
   test("Empty fleet when no ships to place") {

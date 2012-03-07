@@ -10,12 +10,12 @@ import org.hamcrest.CoreMatchers.is
 import org.casa.battleships.strategy.shooting.Shooters.bestShooter
 import org.casa.battleships._
 import testtools.fixtures.Examples.somePosition
-import testtools.fixtures.Examples.classicFleetConfiguration
+import testtools.fixtures.Examples.classicListOfShipSizes
 import testtools.fixtures.Builders.createHistoryOfWater
 
 class GameFunctionalTest extends FunSuite {
   test("Plays game where user starts") {
-    val computerPlayer = new ComputerPlayer(new UpmostAndThenLeftmostPositionChooser, new OneOneShooter, 10, classicFleetConfiguration)
+    val computerPlayer = new ComputerPlayer(new UpmostAndThenLeftmostPositionChooser, new OneOneShooter, 10, classicListOfShipSizes)
 
     assertThat(computerPlayer.playFirstTurn(pos(10, 10)), is(Turn(Water, pos(1, 1))))
 

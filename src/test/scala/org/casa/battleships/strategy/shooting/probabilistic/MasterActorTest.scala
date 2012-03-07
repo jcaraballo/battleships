@@ -22,7 +22,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach {
   val logger = Logger(classOf[MasterActorTest])
 
   test("No possible location when no available space") {
-    assertThat(findThemAll(someFleetConfiguration, Set()), is(Set[FleetLocation]()))
+    assertThat(findThemAll(someListOfShipSizes, Set()), is(Set[FleetLocation]()))
   }
 
   test("Empty fleet when no ships to place") {
@@ -70,7 +70,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach {
   }
 
   test("Times out when request takes longer than time out"){
-    val future = master.ask(MasterActor.Request(Examples.classicFleetConfiguration, Positions.createGrid(10)))
+    val future = master.ask(MasterActor.Request(Examples.classicListOfShipSizes, Positions.createGrid(10)))
     try {
       Await.result(future, 1 milli)
       fail("Should throw a TimeoutException")
