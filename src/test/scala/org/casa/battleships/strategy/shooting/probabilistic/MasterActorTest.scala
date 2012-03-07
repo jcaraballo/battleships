@@ -58,7 +58,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
   override def beforeEach() {
     actorSystem = ActorSystem("MySystem")
     worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
-    master = actorSystem.actorOf(Props(new MasterActor(worker)), name = "fleet_placer")
+    master = actorSystem.actorOf(Props(new MasterActor(worker)), name = "worker")
   }
 
   override def afterEach() {
