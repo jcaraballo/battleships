@@ -42,8 +42,6 @@ class MasterActor(workerActor: ActorRef) extends Actor {
       }
       catch {
         case e => {
-          log.info("While processing Request("  + shipSizes + ", " + fleetConfigurations + ") exception was thrown: " +
-            e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
           sender ! akka.actor.Status.Failure(e)
           throw e
         }
