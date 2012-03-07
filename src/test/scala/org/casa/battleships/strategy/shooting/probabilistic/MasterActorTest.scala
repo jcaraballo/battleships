@@ -36,7 +36,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
 
     master = actorSystem.actorOf(Props(new MasterActor(fakeWorker)), name = "master")
 
-    val future: Future[Any] = master ? MasterActor.SelfRequest(someShipSize :: Nil, Set(fleetConfiguration))
+    val future: Future[Any] = master ? MasterActor.Request(someShipSize :: Nil, Set(fleetConfiguration))
     Await.result(future, duration) match {
       case response: MasterActor.Response => response should equal (MasterActor.Response(Set(fleetLocation1, fleetLocation2)))
 
@@ -45,7 +45,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
   }
 
   test("Times out when request takes longer than time out"){
-    val future = master.ask(MasterActor.Request(Examples.classicListOfShipSizes, Positions.createGrid(10)))
+    val future = master.ask(MasterActor.Request(classicListOfShipSizes, Set(FleetConfiguration(Positions.createGrid(10)))))
     try {
       Await.result(future, 1 milli)
       fail("Should throw a TimeoutException")

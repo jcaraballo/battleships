@@ -12,7 +12,6 @@ import akka.event.Logging
 import akka.util.{Duration, Timeout}
 
 class MasterActor(workerActor: ActorRef) extends Actor {
-
   import context._
 
   val log = Logging(system, this)
@@ -21,24 +20,8 @@ class MasterActor(workerActor: ActorRef) extends Actor {
   implicit val timeout = Timeout(duration)
 
   def receive = {
-    case Request(shipSizes, available) => {
-      log.info("Entered Request(" + shipSizes + ", " + available + ")")
-      try {
-        val future = context.actorOf(Props(new MasterActor(workerActor))) ? SelfRequest(shipSizes, Set(FleetConfiguration(available)))
-        sender ! Await.result(future, duration).asInstanceOf[Response]
-      }
-      catch {
-        case e => {
-          log.error("While processing Request(" + shipSizes + ", " + available + ") exception was thrown: " +
-            e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
-          sender ! akka.actor.Status.Failure(e)
-          throw e
-        }
-      }
-    }
-
-    case SelfRequest(shipSizes, fleetConfigurations) => {
-      log.info("Entered SelfRequest(" + shipSizes + ", " + fleetConfigurations + ")")
+    case Request(shipSizes, fleetConfigurations) => {
+      log.info("Entered Request(" + shipSizes + ", " + fleetConfigurations + ")")
       try {
         shipSizes match {
           case nextShipSize :: restShipSizes => {
@@ -46,7 +29,7 @@ class MasterActor(workerActor: ActorRef) extends Actor {
               val future = workerActor ? WorkerActor.Request(fleetConfiguration, nextShipSize)
               val result = Await.result(future, duration).asInstanceOf[WorkerActor.Response]
               val clone = context.actorOf(Props(new MasterActor(workerActor)))
-              val allFleetsFuture = clone ? SelfRequest(restShipSizes, result.allFleetConfigurations)
+              val allFleetsFuture = clone ? Request(restShipSizes, result.allFleetConfigurations)
               Await.result(allFleetsFuture, duration) match {
                 case response: Response => response.allFleetLocations
                 case e => log.error("Unexpected"); throw new IllegalArgumentException
@@ -59,7 +42,7 @@ class MasterActor(workerActor: ActorRef) extends Actor {
       }
       catch {
         case e => {
-          log.info("While processing SelfRequest("  + shipSizes + ", " + fleetConfigurations + ") exception was thrown: " +
+          log.info("While processing Request("  + shipSizes + ", " + fleetConfigurations + ") exception was thrown: " +
             e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
           sender ! akka.actor.Status.Failure(e)
           throw e
@@ -70,9 +53,6 @@ class MasterActor(workerActor: ActorRef) extends Actor {
 }
 
 object MasterActor {
-
-  case class Request(shipSizes: List[Int], availability: Set[Position])
-  case class SelfRequest(shipSizes: List[Int], fleetConfigurations: Set[FleetConfiguration])
-
+  case class Request(shipSizes: List[Int], fleetConfigurations: Set[FleetConfiguration])
   case class Response(allFleetLocations: Set[FleetLocation])
 }
