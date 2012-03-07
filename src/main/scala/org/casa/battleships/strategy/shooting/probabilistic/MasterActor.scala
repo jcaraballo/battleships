@@ -25,12 +25,14 @@ class MasterActor(workerActor: ActorRef) extends Actor {
       log.info("Entered Request(" + shipSizes + ", " + available + ")")
       try {
         val future = context.actorOf(Props(new MasterActor(workerActor))) ? SelfRequest(shipSizes, Set(FleetConfiguration(available)))
-        sender ! Await.result(future, duration).asInstanceOf[GenericResponse]
+        sender ! Await.result(future, duration).asInstanceOf[Response]
       }
       catch {
         case e => {
-          log.info("While processing Request(" + shipSizes + ", " + available + ") exception was thrown, sending back wrapped in ExceptionalReponse: " + e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
-          sender ! ExceptionalResponse(e)
+          log.error("While processing Request(" + shipSizes + ", " + available + ") exception was thrown: " +
+            e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
+          sender ! akka.actor.Status.Failure(e)
+          throw e
         }
       }
     }
@@ -47,7 +49,6 @@ class MasterActor(workerActor: ActorRef) extends Actor {
               val allFleetsFuture = clone ? SelfRequest(restShipSizes, result.allFleetConfigurations)
               Await.result(allFleetsFuture, duration) match {
                 case response: Response => response.allFleetLocations
-                case exceptional: ExceptionalResponse => sender ! exceptional; Set() //should kill myself
                 case e => log.error("Unexpected"); throw new IllegalArgumentException
               }
             }
@@ -58,8 +59,10 @@ class MasterActor(workerActor: ActorRef) extends Actor {
       }
       catch {
         case e => {
-          log.info("While processing SelfRequest("  + shipSizes + ", " + fleetConfigurations + ") exception was thrown, sending back wrapped in ExceptionalReponse: " + e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
-          sender ! ExceptionalResponse(e)
+          log.info("While processing SelfRequest("  + shipSizes + ", " + fleetConfigurations + ") exception was thrown: " +
+            e.getMessage + ", cause: " + e.getCause + ", stack trace: " + e.getStackTrace)
+          sender ! akka.actor.Status.Failure(e)
+          throw e
         }
       }
     }
@@ -71,7 +74,5 @@ object MasterActor {
   case class Request(shipSizes: List[Int], availability: Set[Position])
   case class SelfRequest(shipSizes: List[Int], fleetConfigurations: Set[FleetConfiguration])
 
-  case class GenericResponse()
-  case class Response(allFleetLocations: Set[FleetLocation]) extends GenericResponse
-  case class ExceptionalResponse(exception: Throwable) extends GenericResponse
+  case class Response(allFleetLocations: Set[FleetLocation])
 }

@@ -6,7 +6,6 @@ import akka.dispatch.Await
 import akka.pattern.ask
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import akka.util.{Duration, Timeout}
-import akka.actor.{ActorRef, Props, ActorSystem}
 import org.casa.battleships.Position._
 import org.hamcrest.CoreMatchers._
 import collection.immutable.Set
@@ -16,8 +15,11 @@ import org.casa.battleships.{Positions, Position}
 import testtools.fixtures.Builders._
 import testtools.fixtures.Examples
 import java.util.concurrent.TimeoutException
+import akka.actor.{Actor, ActorRef, Props, ActorSystem}
+import grizzled.slf4j.Logger
 
 class MasterActorTest extends FunSuite with BeforeAndAfterEach {
+  val logger = Logger(classOf[MasterActorTest])
 
   test("No possible location when no available space") {
     assertThat(findThemAll(someFleetConfiguration, Set()), is(Set[FleetLocation]()))
@@ -88,10 +90,6 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach {
     val future = master.ask(MasterActor.Request(shipSizes, availability))
     Await.result(future, duration) match {
       case response: MasterActor.Response => response.allFleetLocations
-
-      case exceptionalResponse: MasterActor.ExceptionalResponse => {
-        throw new RuntimeException("Got ExceptionalResponse back", exceptionalResponse.exception)
-      }
 
       case unexpected => throw new IllegalStateException("Got unexpected response back" + unexpected)
     }
