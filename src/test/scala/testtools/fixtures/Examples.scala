@@ -17,4 +17,9 @@ object Examples {
   def someListOfShipSizes = classicListOfShipSizes
 
   def somePosition = pos(1, 1)
+  
+  def someAvailability = Set(pos(10, 9), pos(10, 10))
+  def someOtherAvailability = Set(pos(8, 9), pos(8, 10))
+
+  def someShipSize = 2
 }
