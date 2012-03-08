@@ -17,9 +17,12 @@ final class Bag[T] private(override val toList: List[T], val toMap: Map[T, Int])
 }
 
 object Bag {
-  def apply[T](ts: T*) = {
-    val asList: List[T] = ts.toList
-    val asMap: Map[T, Int] = (Map[T, Int]() /: ts)((acc, t) => acc.updated(t, acc.getOrElse(t, 0) + 1))
+  def fromList[T](asList: List[T]): Bag[T] = {
+    val asMap: Map[T, Int] = (Map[T, Int]() /: asList)((acc, t) => acc.updated(t, acc.getOrElse(t, 0) + 1))
     new Bag[T](asList, asMap)
+  }
+
+  def apply[T](ts: T*) = {
+    fromList(ts.toList)
   }
 }
