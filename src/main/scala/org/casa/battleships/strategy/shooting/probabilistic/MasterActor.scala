@@ -1,6 +1,5 @@
 package org.casa.battleships.strategy.shooting.probabilistic
 
-import org.casa.battleships.Position
 import collection.immutable.Set
 import org.casa.battleships.fleet.FleetLocation
 import akka.pattern.ask
@@ -11,7 +10,7 @@ import akka.actor.{ActorRef, Props, Actor}
 import akka.event.Logging
 import akka.util.{Duration, Timeout}
 
-class MasterActor(workerActor: ActorRef) extends Actor {
+class MasterActor(workerActor: ActorRef)(shipSizes: List[Int]) extends Actor {
   import context._
 
   val log = Logging(system, this)
@@ -20,7 +19,7 @@ class MasterActor(workerActor: ActorRef) extends Actor {
   implicit val timeout = Timeout(duration)
 
   def receive = {
-    case Request(shipSizes, fleetConfigurations) => {
+    case Request(fleetConfigurations) => {
       log.info("Entered Request(" + shipSizes + ", " + fleetConfigurations + ")")
       try {
         shipSizes match {
@@ -28,8 +27,8 @@ class MasterActor(workerActor: ActorRef) extends Actor {
             val t: FleetConfiguration => Set[FleetLocation] = (fleetConfiguration: FleetConfiguration) => {
               val future = workerActor ? WorkerActor.Request(fleetConfiguration, nextShipSize)
               val result = Await.result(future, duration).asInstanceOf[WorkerActor.Response]
-              val clone = context.actorOf(Props(new MasterActor(workerActor)))
-              val allFleetsFuture = clone ? Request(restShipSizes, result.allFleetConfigurations)
+              val clone = context.actorOf(Props(new MasterActor(workerActor)(restShipSizes)))
+              val allFleetsFuture = clone ? Request(result.allFleetConfigurations)
               Await.result(allFleetsFuture, duration) match {
                 case response: Response => response.allFleetLocations
                 case e => log.error("Unexpected"); throw new IllegalArgumentException
@@ -51,6 +50,6 @@ class MasterActor(workerActor: ActorRef) extends Actor {
 }
 
 object MasterActor {
-  case class Request(shipSizes: List[Int], fleetConfigurations: Set[FleetConfiguration])
+  case class Request(fleetConfigurations: Set[FleetConfiguration])
   case class Response(allFleetLocations: Set[FleetLocation])
 }

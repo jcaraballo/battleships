@@ -34,9 +34,9 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
     )
     val fakeWorker = mockWorkerActor(fleetConfiguration, someShipSize, configurationsToBeReturnedByTheMock)
 
-    master = actorSystem.actorOf(Props(new MasterActor(fakeWorker)), name = "master")
+    master = actorSystem.actorOf(Props(new MasterActor(fakeWorker)(someShipSize::Nil)), name = "master")
 
-    val future: Future[Any] = master ? MasterActor.Request(someShipSize :: Nil, Set(fleetConfiguration))
+    val future: Future[Any] = master ? MasterActor.Request(Set(fleetConfiguration))
     Await.result(future, duration) match {
       case response: MasterActor.Response => response should equal (MasterActor.Response(Set(fleetLocation1, fleetLocation2)))
 
@@ -45,7 +45,10 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
   }
 
   test("Times out when request takes longer than time out"){
-    val future = master.ask(MasterActor.Request(classicListOfShipSizes, Set(FleetConfiguration(Positions.createGrid(10)))))
+    worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
+    master = actorSystem.actorOf(Props(new MasterActor(worker)(classicListOfShipSizes)), name = "worker")
+
+    val future = master.ask(MasterActor.Request(Set(FleetConfiguration(Positions.createGrid(10)))))
     try {
       Await.result(future, 1 milli)
       fail("Should throw a TimeoutException")
@@ -57,8 +60,6 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
 
   override def beforeEach() {
     actorSystem = ActorSystem("MySystem")
-    worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
-    master = actorSystem.actorOf(Props(new MasterActor(worker)), name = "worker")
   }
 
   override def afterEach() {
