@@ -6,6 +6,14 @@ final class Bag[T] private(override val toList: List[T], val toMap: Map[T, Int])
 
   def iterator = toList.iterator
 
+  def -(t: T): Bag[T] = {
+    Bag.fromList(removeFirstOccurrence(toList, t))
+  }
+
+  def --(other: Bag[T]): Bag[T] = {
+    Bag.fromList((toList /: other)(removeFirstOccurrence(_, _)))
+  }
+
   override def equals(other: Any): Boolean = other match {
     case that: Bag[_] => toMap == that.toMap
     case _ => false
@@ -14,6 +22,12 @@ final class Bag[T] private(override val toList: List[T], val toMap: Map[T, Int])
   override def hashCode(): Int = toMap.hashCode()
 
   override def toString: String = toList.mkString("Bag(", ", ", ")")
+
+  private def removeFirstOccurrence(ts: List[T], t: T): List[T] = {
+    val indexOfFirstOccurrence = ts.indexOf(t)
+    if (indexOfFirstOccurrence == -1) ts
+    else ts.take(indexOfFirstOccurrence) ::: ts.takeRight(ts.size - indexOfFirstOccurrence - 1)
+  }
 }
 
 object Bag {

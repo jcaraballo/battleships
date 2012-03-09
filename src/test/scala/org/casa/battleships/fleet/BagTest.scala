@@ -29,4 +29,13 @@ class BagTest extends FunSuite with ShouldMatchers {
     Bag(1, 2, 2) should not equal (Bag(1, 2))
     Bag(1, 2, 2) should not equal (Bag(1, 2, 2, 2))
   }
+
+  test("Subtracts one element"){
+    (Bag(1, 2, 2, 3) - 1) should equal (Bag(2, 2, 3))
+    (Bag(1, 2, 2, 3) - 2) should equal (Bag(1, 2, 3))
+  }
+  
+  test("Subtracts another bag") {
+    (Bag(1, 2, 2, 3) -- Bag(1, 2)) should equal(Bag(2, 3))
+  }
 }
