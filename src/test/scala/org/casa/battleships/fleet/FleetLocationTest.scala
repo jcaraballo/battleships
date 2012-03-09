@@ -8,7 +8,7 @@ import org.scalatest.matchers.ShouldMatchers
 
 class FleetLocationTest extends FunSuite with ShouldMatchers {
   val location1 = new ShipLocation(pos(1, 1), pos(2, 1))
-  val location2 = new ShipLocation(pos(1, 1), pos(2, 1))
+  val location2 = new ShipLocation(pos(1, 2), pos(2, 2))
 
   test("can add ship locations using the '+' operator") {
     assertThat(new FleetLocation(Set()) + location1, is(new FleetLocation(Set(location1))))
