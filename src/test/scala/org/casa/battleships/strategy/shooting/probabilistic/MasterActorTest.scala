@@ -7,12 +7,12 @@ import akka.util.{Duration, Timeout}
 import org.casa.battleships.Position._
 import collection.immutable.Set
 import testtools.fixtures.Examples._
-import org.casa.battleships.fleet.{FleetLocation, ShipLocation}
 import org.casa.battleships.Positions
 import java.util.concurrent.TimeoutException
 import akka.actor.{Actor, ActorRef, Props, ActorSystem}
 import akka.dispatch.{Future, Await}
 import org.scalatest.matchers.ShouldMatchers
+import org.casa.battleships.fleet.{Bag, FleetLocation, ShipLocation}
 
 class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
   val duration: Duration = 1 second
@@ -30,7 +30,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
     )
     val fakeWorker = mockWorkerActor(fleetConfiguration, someShipSize, configurationsToBeReturnedByTheMock)
 
-    val master = actorSystem.actorOf(Props(new MasterActor(fakeWorker)(someShipSize::Nil)), name = "master")
+    val master = actorSystem.actorOf(Props(new MasterActor(fakeWorker)(Bag(someShipSize))), name = "master")
 
     val future: Future[Any] = master ? MasterActor.Request(Set(fleetConfiguration))
     Await.result(future, duration) match {
@@ -42,7 +42,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
 
   test("Times out when request takes longer than time out"){
     val worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
-    val master = actorSystem.actorOf(Props(new MasterActor(worker)(classicListOfShipSizes)), name = "worker")
+    val master = actorSystem.actorOf(Props(new MasterActor(worker)(classicBagOfShipSizes)), name = "worker")
 
     val future = master.ask(MasterActor.Request(Set(FleetConfiguration(Positions.createGrid(10)))))
     try {

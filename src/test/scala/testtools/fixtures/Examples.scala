@@ -1,8 +1,8 @@
 package testtools.fixtures
 
-import org.casa.battleships.fleet.{Ship, Fleet}
 import org.casa.battleships.Position._
 import org.casa.battleships.fleet.Ship.immaculateShip
+import org.casa.battleships.fleet.{Bag, Ship, Fleet}
 
 object Examples {
   def someFleet: Fleet = new Fleet(
@@ -14,6 +14,7 @@ object Examples {
     )
 
   def classicListOfShipSizes = List(5, 4, 3, 3, 2)
+  def classicBagOfShipSizes = Bag(5, 4, 3, 3, 2)
   def someListOfShipSizes = classicListOfShipSizes
 
   def somePosition = pos(1, 1)
