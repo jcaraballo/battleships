@@ -1,12 +1,10 @@
 package integration
 
-import org.junit.Assert._
 import akka.util.duration._
 import akka.pattern.ask
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import akka.util.{Duration, Timeout}
 import org.casa.battleships.Position._
-import org.hamcrest.CoreMatchers._
 import collection.immutable.Set
 import testtools.fixtures.Examples._
 import org.casa.battleships.fleet.{FleetLocation, ShipLocation}
@@ -39,9 +37,9 @@ class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach w
       new ShipLocation(pos(2, 1), pos(2, 2))
     )
 
-    assertThat(findThemAll(2 :: 2 :: Nil, Positions.createGrid(2)), is(Set(
+    findThemAll(2 :: 2 :: Nil, Positions.createGrid(2)) should equal(Set(
       new FleetLocation(horizontalShips), new FleetLocation(verticalShips)
-    )))
+    ))
   }
 
   test("Finds unique fleet when there is only one place where it fits") {
@@ -64,9 +62,9 @@ class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach w
 
     val available = Positions.createGrid(10) -- waterPositions
 
-    assertThat(findThemAll(5 :: Nil, available), is(Set(
+    findThemAll(5 :: Nil, available) should equal(Set(
       new FleetLocation(Set(ShipLocation(Set(pos(1, 10), pos(2, 10), pos(3, 10), pos(4, 10), pos(5, 10)))))
-    )))
+    ))
   }
 
   override def beforeEach() {
