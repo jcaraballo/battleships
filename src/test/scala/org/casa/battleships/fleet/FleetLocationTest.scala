@@ -5,6 +5,7 @@ import org.casa.battleships.Position.pos
 import org.junit.Assert.assertThat
 import org.hamcrest.CoreMatchers.is
 import org.scalatest.matchers.ShouldMatchers
+import org.mockito.Mockito._
 
 class FleetLocationTest extends FunSuite with ShouldMatchers {
   val location1 = new ShipLocation(pos(1, 1), pos(2, 1))
@@ -22,5 +23,21 @@ class FleetLocationTest extends FunSuite with ShouldMatchers {
     val fleetLocation = FleetLocation(Set(size5Ship, size4Ship))
 
     fleetLocation.shipSizes should equal(Bag(5, 4))
+  }
+
+  test("One FC subsets another iff their sets of ship locations do") {
+    val locations1: Set[ShipLocation] = mockSetOfShipLocation
+    val locations2: Set[ShipLocation] = mockSetOfShipLocation
+    when(locations1.subsetOf(locations2)).thenReturn(true)
+    FleetLocation(locations1) ⊆ (FleetLocation(locations2)) should be(true)
+
+    val locations3: Set[ShipLocation] = mockSetOfShipLocation
+    val locations4: Set[ShipLocation] = mockSetOfShipLocation
+    when(locations3.subsetOf(locations4)).thenReturn(false)
+    FleetLocation(locations3) ⊆ (FleetLocation(locations4)) should be(false)
+  }
+
+  private def mockSetOfShipLocation: Set[ShipLocation] = {
+    mock(classOf[Set[ShipLocation]])
   }
 }
