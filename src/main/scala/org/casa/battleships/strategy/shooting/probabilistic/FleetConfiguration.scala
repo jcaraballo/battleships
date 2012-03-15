@@ -7,6 +7,9 @@ case class FleetConfiguration(fleet: FleetLocation, availability: Set[Position])
   def +(newShipLocation: ShipLocation) = FleetConfiguration(fleet + newShipLocation, availability -- newShipLocation.squares)
 
   def shipSizes: Bag[Int] = fleet.shipSizes
+
+  def subsetOf(other: FleetConfiguration): Boolean = fleet subsetOf other.fleet
+  def ⊆(other: FleetConfiguration) = subsetOf(other)
 }
 
 object FleetConfiguration {
