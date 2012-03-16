@@ -12,15 +12,14 @@ import testtools.fixtures.Builders._
 import akka.actor.{ActorRef, Props, ActorSystem}
 import akka.dispatch.Await
 import org.scalatest.matchers.ShouldMatchers
-import org.casa.battleships.strategy.shooting.probabilistic.{ShipLocationMultiplyPlacer, WorkerActor, MasterActor, FleetConfiguration}
 import org.casa.battleships.fleet.{Bag, FleetLocation, ShipLocation}
+import org.casa.battleships.strategy.shooting.probabilistic._
 
 class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
   val duration: Duration = 1 second
   implicit val timeout = Timeout(duration)
 
   var actorSystem: ActorSystem = _
-  var worker: ActorRef = _
   var master: ActorRef = _
 
   val fleetLocation1 = FleetLocation(Set(ShipLocation(Set(pos(1, 2), pos(2, 2)))))
@@ -76,8 +75,10 @@ class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach w
   }
 
   private def findThemAll(shipSizes: Bag[Int], availability: Set[Position]): Set[FleetLocation] = {
-    worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
-    master = actorSystem.actorOf(Props(new MasterActor(worker)(shipSizes)), name = "master")
+    val workerFactory: ActorFactory = new ActorFactory{
+      def create: ActorRef = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
+    }
+    master = actorSystem.actorOf(Props(new MasterActor(workerFactory)(shipSizes)), name = "master")
     val future = master.ask(MasterActor.Request(Set(FleetConfiguration(availability))))
     Await.result(future, duration) match {
       case response: MasterActor.Response => response.allFleetLocations

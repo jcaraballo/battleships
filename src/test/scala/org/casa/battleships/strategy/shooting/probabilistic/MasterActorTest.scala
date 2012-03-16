@@ -28,9 +28,9 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
       FleetConfiguration(fleetLocation1, someOtherAvailability),
       FleetConfiguration(fleetLocation2, someOtherAvailability)
     )
-    val fakeWorker = mockWorkerActor(fleetConfiguration, someShipSize, configurationsToBeReturnedByTheMock)
+    val fakeWorkerFactory = factoryThatReturns(mockWorkerActor(fleetConfiguration, someShipSize, configurationsToBeReturnedByTheMock))
 
-    val master = actorSystem.actorOf(Props(new MasterActor(fakeWorker)(Bag(someShipSize))), name = "master")
+    val master = actorSystem.actorOf(Props(new MasterActor(fakeWorkerFactory)(Bag(someShipSize))), name = "master")
 
     val future: Future[Any] = master ? MasterActor.Request(Set(fleetConfiguration))
     Await.result(future, duration) match {
@@ -41,8 +41,8 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
   }  
 
   test("Times out when request takes longer than time out"){
-    val worker = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
-    val master = actorSystem.actorOf(Props(new MasterActor(worker)(classicBagOfShipSizes)), name = "worker")
+    val workerFactory = factoryThatReturns(actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer))))
+    val master = actorSystem.actorOf(Props(new MasterActor(workerFactory)(classicBagOfShipSizes)), name = "worker")
 
     val future = master.ask(MasterActor.Request(Set(FleetConfiguration(Positions.createGrid(10)))))
     try {
@@ -69,5 +69,13 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
         case somethingElse => sender ! akka.actor.Status.Failure(new AssertionError("Unexpected request: " + somethingElse))
       }
     }))
+  }
+
+  private def factoryThatReturns(worker: ActorRef): ActorFactory = {
+    new ActorFactory {
+      def create = {
+        worker
+      }
+    }
   }
 }
