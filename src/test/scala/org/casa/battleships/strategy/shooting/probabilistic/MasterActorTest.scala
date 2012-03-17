@@ -65,7 +65,9 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
   private def mockWorkerActor(expectedFleetConfiguration: FleetConfiguration, expectedShipSize: Int, toBeReplied: Set[FleetConfiguration]): ActorRef = {
     actorSystem.actorOf(Props(new Actor() {
       protected def receive = {
-        case WorkerActor.Request(fc, ss) if (expectedFleetConfiguration == fc && expectedShipSize == ss) => sender ! WorkerActor.Response(toBeReplied)
+        case WorkerActor.Request(fc, ss) if (expectedFleetConfiguration == fc && expectedShipSize == ss) => {
+          sender ! WorkerActor.Response(expectedFleetConfiguration, toBeReplied)
+        }
         case somethingElse => sender ! akka.actor.Status.Failure(new AssertionError("Unexpected request: " + somethingElse))
       }
     }))

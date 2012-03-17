@@ -40,10 +40,10 @@ class WorkerActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
     val future = worker.ask(WorkerActor.Request(fleetConfiguration, 2))
     val response = Await.result(future, duration).asInstanceOf[WorkerActor.Response]
 
-    response.allFleetConfigurations should equal(Set(
+    response should equal(WorkerActor.Response(fleetConfiguration, Set(
       fleetConfiguration_plusShipLocation1,
       fleetConfiguration_plusShipLocation2
-    ))
+    )))
   }
 
   override def beforeEach() {

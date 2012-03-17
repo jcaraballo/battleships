@@ -7,11 +7,11 @@ class WorkerActor(shipPlacer: ShipLocationMultiplyPlacer) extends Actor {
   def receive = {
     case Request(fleetConfiguration, shipSize) => {
       val allPossibleLocations = shipPlacer.findAllShipLocations(shipSize, fleetConfiguration.availability)
-      sender ! Response(allPossibleLocations.map(location => fleetConfiguration + location))
+      sender ! Response(fleetConfiguration, allPossibleLocations.map(location => fleetConfiguration + location))
     }
   }
 }
 object WorkerActor {
   case class Request(fleetConfiguration: FleetConfiguration, shipSize: Int)
-  case class Response(allFleetConfigurations: Set[FleetConfiguration])
+  case class Response(originalFleetConfiguration: FleetConfiguration, allFleetConfigurations: Set[FleetConfiguration])
 }
