@@ -10,7 +10,7 @@ libraryDependencies ++= Seq(
   "junit" % "junit" % "4.10" % "test->default",
   "org.scalatest" %% "scalatest" % "1.6.1" % "test",
   "org.mockito" % "mockito-core" % "1.9.0" % "test",
-  "com.typesafe.akka" % "akka-actor" % "2.0-RC2",
+  "com.typesafe.akka" % "akka-actor" % "2.0.1",
   "ch.qos.logback" % "logback-classic" % "1.0.0",
   "org.clapper" %% "grizzled-slf4j" % "0.6.6"
 )
