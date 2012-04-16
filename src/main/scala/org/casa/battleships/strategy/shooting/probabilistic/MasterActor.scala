@@ -36,7 +36,7 @@ class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Acto
             }
             sender ! Response(fleetConfigurations.flatMap(t))
           }
-          case empty => sender ! Response(fleetConfigurations.map(_.fleet))
+          case empty => sender ! Response(fleetConfigurations.map(_.location))
         }
       }
       catch {

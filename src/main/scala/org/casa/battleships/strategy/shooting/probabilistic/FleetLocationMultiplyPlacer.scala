@@ -19,7 +19,7 @@ class FleetLocationMultiplyPlacer(shipPlacer: ShipLocationMultiplyPlacer) {
 
         recursiveFindAllValidLocations(restShipSizes, newConfigurations)
       }
-      case empty => configurations.map(_.fleet)
+      case empty => configurations.map(_.location)
     }
   }
 }
