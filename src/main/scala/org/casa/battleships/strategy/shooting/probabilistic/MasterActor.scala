@@ -1,10 +1,8 @@
 package org.casa.battleships.strategy.shooting.probabilistic
 
 import collection.immutable.Set
-import akka.util.duration._
 import MasterActor._
 import akka.event.Logging
-import akka.util.{Duration, Timeout}
 import org.casa.battleships.fleet.{Bag, FleetLocation}
 import akka.actor.{ActorRef, Actor}
 
@@ -12,9 +10,6 @@ class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Acto
   import context._
 
   val log = Logging(system, this)
-
-  private val duration: Duration = 1 second
-  implicit val timeout = Timeout(duration)
 
   var fleets = Set[FleetConfiguration]()
   var originator: ActorRef = _
@@ -62,7 +57,7 @@ class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Acto
     log.info("fleets updated to: " + fleets)
 
     log.info("incomplete: " + incompleteFleetConfigurations)
-    
+
     incompleteFleetConfigurations.foreach {
       fleet => {
         log.info("For fleet: " + fleet)
