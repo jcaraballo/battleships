@@ -40,10 +40,10 @@ class FleetLocationMultiplyPlacerTest extends FunSuite with ShouldMatchers{
     )))
   }
 
-  test("All possible fleets for 3 ships in a 6x6 grid are calculated in less than 4.2 seconds") {
+  test("All possible fleets for 3 ships in a 6x6 grid are calculated in less than 9 seconds") {
     val timeItTook: Long = time(placer.findAllValidLocations(3 :: 3 :: 2 :: Nil, Positions.createGrid(6)))._2
     logger.info("It took " + timeItTook + "ms")
-    timeItTook should be < (2100L * 2)
+    timeItTook should be < (4500L * 2)
   }
 
   test("Finds unique fleet when there is only one place where it fits"){
