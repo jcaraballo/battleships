@@ -9,10 +9,13 @@ import collection.immutable.Set
 import testtools.fixtures.Examples._
 import org.casa.battleships.Positions
 import java.util.concurrent.TimeoutException
-import akka.actor.{Actor, ActorRef, Props, ActorSystem}
 import akka.dispatch.{Future, Await}
 import org.scalatest.matchers.ShouldMatchers
 import org.casa.battleships.fleet.{Bag, FleetLocation, ShipLocation}
+import org.mockito.Mockito._
+import akka.actor._
+import akka.testkit.TestActorRef
+import org.casa.battleships.strategy.shooting.probabilistic.MasterActor.Response
 
 class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
   val duration: Duration = 1 second
@@ -20,27 +23,43 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
   var actorSystem: ActorSystem = _
 
   val fleetLocation1 = FleetLocation(Set(ShipLocation(Set(pos(1, 2), pos(2, 2)))))
-  val fleetLocation2 = FleetLocation(Set(ShipLocation(Set(pos(4, 2), pos(4, 2)))))
+  val fleetLocation2 = FleetLocation(Set(ShipLocation(Set(pos(4, 2), pos(5, 2)))))
   val fleetConfiguration = FleetConfiguration(someAvailability)
 
-  test("Given one fleet conf and one ship size, delegates to worker and returns a location per returned conf"){
+  test("Responds with the original if it is already complete") {
+    val workerFactory: ActorFactory = mock(classOf[ActorFactory])
+    val fleetLocation = mock(classOf[FleetLocation])
+    when(fleetLocation.shipSizes).thenReturn(Bag(3))
+    val fleetConfiguration = new FleetConfiguration(fleetLocation, someAvailability)
+
+    val master = TestActorRef(new MasterActor(workerFactory)(Bag(3)))(actorSystem)
+
+    val actualResponse = Await.result(master ? MasterActor.Request(Set(fleetConfiguration)), 1 seconds).asInstanceOf[Response]
+
+    actualResponse should equal(MasterActor.Response(Set(fleetLocation)))
+
+    verifyZeroInteractions(workerFactory)
+  }
+
+  test("Given one that no ships have been placed and there's one ship to be placed, delegates to worker and responds with a location per returned conf") {
     val configurationsToBeReturnedByTheMock = Set(
       FleetConfiguration(fleetLocation1, someOtherAvailability),
       FleetConfiguration(fleetLocation2, someOtherAvailability)
     )
-    val fakeWorkerFactory = factoryThatReturns(mockWorkerActor(fleetConfiguration, someShipSize, configurationsToBeReturnedByTheMock))
 
-    val master = actorSystem.actorOf(Props(new MasterActor(fakeWorkerFactory)(Bag(someShipSize))), name = "master")
+    val workerFactory = factoryThatReturns(mockWorkerActor(fleetConfiguration, someShipSize, configurationsToBeReturnedByTheMock))
+
+    val master = TestActorRef(new MasterActor(workerFactory)(Bag(someShipSize)), name = "master")(actorSystem)
 
     val future: Future[Any] = master ? MasterActor.Request(Set(fleetConfiguration))
-    Await.result(future, duration) match {
-      case response: MasterActor.Response => response should equal (MasterActor.Response(Set(fleetLocation1, fleetLocation2)))
+    Await.result(future, 20 seconds) match {
+      case response: MasterActor.Response => response should equal(MasterActor.Response(Set(fleetLocation1, fleetLocation2)))
 
       case unexpected => throw new IllegalStateException("Got unexpected response back" + unexpected)
     }
-  }  
+  }
 
-  test("Times out when request takes longer than time out"){
+  test("Times out when request takes longer than time out") {
     val workerFactory = factoryThatReturns(actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer))))
     val master = actorSystem.actorOf(Props(new MasterActor(workerFactory)(classicBagOfShipSizes)), name = "worker")
 
