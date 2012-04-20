@@ -2,7 +2,7 @@ package testtools.fixtures
 
 import org.casa.battleships.Position._
 import org.casa.battleships.fleet.Ship.immaculateShip
-import org.casa.battleships.fleet.{Bag, Ship, Fleet}
+import org.casa.battleships.fleet._
 
 object Examples {
   def someFleet: Fleet = new Fleet(
@@ -23,4 +23,14 @@ object Examples {
   def someOtherAvailability = Set(pos(8, 9), pos(8, 10))
 
   def someShipSize = 2
+
+  def someFleetLocation = FleetLocation(someFleet.ships.map(_.location))
+
+  def someOtherFleetLocation = FleetLocation(Set(
+    new ShipLocation(pos(1, 6), pos(5, 6)),
+    new ShipLocation(pos(1, 7), pos(4, 7)),
+    new ShipLocation(pos(1, 8), pos(3, 8)),
+    new ShipLocation(pos(1, 9), pos(3, 9)),
+    new ShipLocation(pos(1, 10), pos(2, 10))
+  ))
 }
