@@ -1,5 +1,7 @@
 package org.casa.battleships.fleet
 
+import org.casa.battleships.Position
+
 case class FleetLocation(shipLocations: Set[ShipLocation]) {
   def shipSizes: Bag[Int] = Bag.fromList(shipLocations.toList.map(shipLocation => shipLocation.squares.size))
 
@@ -7,4 +9,6 @@ case class FleetLocation(shipLocations: Set[ShipLocation]) {
 
   def subsetOf(other: FleetLocation): Boolean = shipLocations.subsetOf(other.shipLocations)
   def ⊆(other: FleetLocation) = subsetOf(other)
+
+  def squares: Set[Position] = shipLocations.flatMap(_.squares)
 }

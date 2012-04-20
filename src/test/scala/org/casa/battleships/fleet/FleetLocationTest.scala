@@ -37,6 +37,10 @@ class FleetLocationTest extends FunSuite with ShouldMatchers {
     FleetLocation(locations3) ⊆ (FleetLocation(locations4)) should be(false)
   }
 
+  test("its squares are the join of the ones of its ship locations"){
+    FleetLocation(Set(location1, location2)).squares should be(location1.squares ++ location2.squares)
+  }
+
   private def mockSetOfShipLocation: Set[ShipLocation] = {
     mock(classOf[Set[ShipLocation]])
   }
