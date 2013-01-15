@@ -1,24 +1,25 @@
 package org.casa.battleships.strategy.shooting.probabilistic
 
-import akka.util.duration._
+import scala.concurrent.duration._
 import akka.pattern.ask
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
-import akka.util.{Duration, Timeout}
+import akka.util.Timeout
 import org.casa.battleships.Position._
 import collection.immutable.Set
 import testtools.fixtures.Examples._
 import org.casa.battleships.Positions
 import java.util.concurrent.TimeoutException
-import akka.dispatch.{Future, Await}
+import scala.concurrent.{Future, Await}
 import org.scalatest.matchers.ShouldMatchers
 import org.casa.battleships.fleet.{Bag, FleetLocation, ShipLocation}
 import org.mockito.Mockito._
 import akka.actor._
 import akka.testkit.TestActorRef
 import org.casa.battleships.strategy.shooting.probabilistic.MasterActor.Response
+import concurrent.duration.FiniteDuration
 
 class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
-  val duration: Duration = 1 second
+  val duration: FiniteDuration = 1.second
   implicit val timeout = Timeout(duration)
   var actorSystem: ActorSystem = _
 
@@ -78,12 +79,12 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
   }
 
   override def afterEach() {
-    actorSystem.shutdown
+    actorSystem.shutdown()
   }
 
   private def mockWorkerActor(expectedFleetConfiguration: FleetConfiguration, expectedShipSize: Int, toBeReplied: Set[FleetConfiguration]): ActorRef = {
     actorSystem.actorOf(Props(new Actor() {
-      protected def receive = {
+      def receive = {
         case WorkerActor.Request(fc, ss) if (expectedFleetConfiguration == fc && expectedShipSize == ss) => {
           sender ! WorkerActor.Response(expectedFleetConfiguration, toBeReplied)
         }

@@ -3,11 +3,11 @@ package org.casa.battleships.strategy.shooting
 import akka.actor.{ActorSystem, Props, Actor}
 import akka.pattern.ask
 import org.mockito.Mockito._
-import akka.util.{Timeout}
-import akka.util.duration._
+import akka.util.Timeout
+import scala.concurrent.duration._
 import probabilistic.{FleetConfiguration, MasterActor}
 import org.casa.battleships.Position.pos
-import akka.dispatch.{Await, Future}
+import concurrent.{Await, Future}
 import org.scalatest.matchers.ShouldMatchers
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import org.casa.battleships.Positions._
@@ -30,7 +30,7 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val master = actorSystem.actorOf(Props(new Actor {
       var calledTimes: Int = 0
 
-      protected def receive = {
+      def receive = {
         case MasterActor.Request(fleetConfigurations) if fleetConfigurations == Set(FleetConfiguration(availability)) => {
           calledTimes += 1
           sender ! MasterActor.Response(Set[FleetLocation]())
@@ -59,7 +59,7 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val master = actorSystem.actorOf(Props(new Actor {
       var calledTimes: Int = 0
 
-      protected def receive = {
+      def receive = {
         case MasterActor.Request(fleetConfigurations) if fleetConfigurations == Set(FleetConfiguration(availability)) => {
           calledTimes += 1
           sender ! MasterActor.Response(Set[FleetLocation](someFleetLocation))
@@ -88,7 +88,7 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val master = actorSystem.actorOf(Props(new Actor {
       var calledTimes: Int = 0
 
-      protected def receive = {
+      def receive = {
         case MasterActor.Request(fleetConfigurations) if fleetConfigurations == Set(FleetConfiguration(availability)) => {
           calledTimes += 1
           sender ! MasterActor.Response(Set[FleetLocation](someFleetLocation, someOtherFleetLocation))
@@ -130,7 +130,7 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val master = actorSystem.actorOf(Props(new Actor {
       var calledTimes: Int = 0
 
-      protected def receive = {
+      def receive = {
         case MasterActor.Request(fleetConfigurations) if fleetConfigurations == Set(FleetConfiguration(availability)) => {
           calledTimes += 1
           sender ! MasterActor.Response(Set[FleetLocation](compatibleFleetLocation, incompatibleFleetLocation))

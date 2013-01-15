@@ -8,9 +8,10 @@ import org.casa.battleships.{ShotOutcome, Position}
 import org.casa.battleships.ShotOutcome.Water
 import probabilistic._
 import org.casa.battleships.strategy.positionchoice.PositionChooser
-import akka.dispatch.Future
+import scala.concurrent.Future
 import probabilistic.MasterActor.Response
 import org.casa.battleships.fleet.{FleetLocation, Bag}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class PossibleShooter(chooser: PositionChooser, master: ActorRef, shipSizes: Bag[Int])(implicit timeout: Timeout) {
   def shoot(shootable: Set[Position], history: List[(Position, ShotOutcome.Value)]): Future[Option[Position]] = {

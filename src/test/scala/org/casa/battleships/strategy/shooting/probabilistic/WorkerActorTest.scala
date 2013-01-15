@@ -1,10 +1,10 @@
 package org.casa.battleships.strategy.shooting.probabilistic
 
-import akka.util.duration._
-import akka.dispatch.Await
+import scala.concurrent.duration._
+import scala.concurrent.Await
 import akka.pattern.ask
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
-import akka.util.{Duration, Timeout}
+import akka.util.Timeout
 import akka.actor.{ActorRef, Props, ActorSystem}
 import org.casa.battleships.Position._
 import org.casa.battleships.Positions._
@@ -14,7 +14,7 @@ import org.casa.battleships.fleet.ShipLocation
 import org.scalatest.matchers.ShouldMatchers
 
 class WorkerActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
-  val duration: Duration = 1 second
+  val duration: FiniteDuration = 1.second
   implicit val timeout = Timeout(duration)
   var actorSystem: ActorSystem = _
   var worker: ActorRef = _

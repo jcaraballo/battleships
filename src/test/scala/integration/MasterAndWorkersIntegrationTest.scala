@@ -1,23 +1,23 @@
 package integration
 
-import akka.util.duration._
+import scala.concurrent.duration._
 import akka.pattern.ask
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
-import akka.util.{Duration, Timeout}
+import akka.util.Timeout
 import org.casa.battleships.Position._
 import collection.immutable.Set
 import testtools.fixtures.Examples._
 import org.casa.battleships.{Positions, Position}
 import testtools.fixtures.Builders._
 import akka.actor.{ActorRef, Props, ActorSystem}
-import akka.dispatch.Await
+import scala.concurrent.Await
 import org.scalatest.matchers.ShouldMatchers
 import org.casa.battleships.fleet.{Bag, FleetLocation, ShipLocation}
 import org.casa.battleships.strategy.shooting.probabilistic._
 
 class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
-  val duration: Duration = 1.second
-  implicit val timeout = Timeout(duration)
+  val duration: FiniteDuration = 1.second
+  implicit val timeout = new Timeout(duration)
 
   var actorSystem: ActorSystem = _
   var master: ActorRef = _
@@ -42,7 +42,7 @@ class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach w
   }
 
   test("Finds unique fleet when there is only one place where it fits") {
-    val waterPositions = createHistoryOfWater("""
+    val waterPositions = createHistoryOfWater( """
       1 2 3 4 5 6 7 8 9 0
       ~~~~~~~~~~~~~~~~~~~
     1{  ·   ·   ·   ·   ·}1
@@ -75,7 +75,7 @@ class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach w
   }
 
   private def findThemAll(shipSizes: Bag[Int], availability: Set[Position]): Set[FleetLocation] = {
-    val workerFactory: ActorFactory = new ActorFactory{
+    val workerFactory: ActorFactory = new ActorFactory {
       def create: ActorRef = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
     }
     master = actorSystem.actorOf(Props(new MasterActor(workerFactory)(shipSizes)), name = "master")
