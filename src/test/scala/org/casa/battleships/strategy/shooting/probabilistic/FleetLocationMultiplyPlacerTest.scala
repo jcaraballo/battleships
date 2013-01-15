@@ -10,10 +10,8 @@ import testtools.fixtures.Builders.createHistoryOfWater
 import testtools.fixtures.Examples.someListOfShipSizes
 import testtools.Stopwatch.time
 import org.scalatest.matchers.ShouldMatchers
-import grizzled.slf4j.Logger
 
 class FleetLocationMultiplyPlacerTest extends FunSuite with ShouldMatchers{
-  val logger = Logger(classOf[FleetLocationMultiplyPlacerTest])
 
   val placer = new FleetLocationMultiplyPlacer(new ShipLocationMultiplyPlacer)
 
@@ -42,7 +40,6 @@ class FleetLocationMultiplyPlacerTest extends FunSuite with ShouldMatchers{
 
   test("All possible fleets for 3 ships in a 6x6 grid are calculated in less than 9 seconds") {
     val timeItTook: Long = time(placer.findAllValidLocations(3 :: 3 :: 2 :: Nil, Positions.createGrid(6)))._2
-    logger.info("It took " + timeItTook + "ms")
     timeItTook should be < (4500L * 2)
   }
 
