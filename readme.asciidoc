@@ -4,13 +4,9 @@ Joaquín Caraballo
 
 Instructions
 ------------
-* Start sbt (0.11.0). Your might have to clean ~/.sbt/ if you have used gen-idea with an earlier version of sbt before
+* You need sbt. (Tried with 0.12.1). Start sbt
 
-    $ ./sbt
-
-* Update to download dependencies (junit, scalatest and hamcrest apart from scala and sbt's)
-
-    update
+    $ sbt
 
 * Start the console
 
