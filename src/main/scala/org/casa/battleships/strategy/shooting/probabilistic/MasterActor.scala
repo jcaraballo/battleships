@@ -15,7 +15,7 @@ class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Acto
   var originator: ActorRef = _
 
   def receive = {
-    case Request(fleetConfigurations) => {
+    case Request(fleetConfigurations) =>
       originator = sender
       log.info("Master received Request(" + fleetConfigurations + "), shipSizes: " + shipSizes)
       try {
@@ -27,7 +27,6 @@ class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Acto
           throw e
         }
       }
-    }
 
     case WorkerActor.Response(originalFleetConfiguration, newFleetConfigurations) => {
       log.info("Master received WorkerActor.Response(" + newFleetConfigurations + ")")
@@ -47,30 +46,19 @@ class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Acto
   }
 
   private def process(fleetConfigurations: Set[FleetConfiguration]) {
-    log.info("Entering process(" + fleetConfigurations + ")")
     val newFleetConfigurations = fleetConfigurations -- fleets
-
-    log.info("newFleetConfigurations: " + newFleetConfigurations)
 
     fleets ++= newFleetConfigurations
 
-    log.info("fleets updated to: " + fleets)
-
-    log.info("incomplete: " + incompleteFleetConfigurations)
-
     incompleteFleetConfigurations.foreach {
       fleet => {
-        log.info("For fleet: " + fleet)
         val requestForWorker = WorkerActor.Request(fleet, (shipSizes -- fleet.shipSizes).head)
-        log.info("Calling worker with " + requestForWorker)
         workerFactory.create ! requestForWorker
-        log.info("Called worker with " + requestForWorker)
       }
     }
 
     if (incompleteFleetConfigurations.isEmpty) {
       val response = Response(fleets.map(_.location))
-      log.info("incompleteFleetConfigurations is empty, exiting with response: " + response)
       originator ! response
     }
   }

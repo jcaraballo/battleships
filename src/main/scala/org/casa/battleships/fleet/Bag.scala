@@ -21,7 +21,7 @@ final class Bag[T] private(override val toList: List[T], val toMap: Map[T, Int])
 
   override def hashCode(): Int = toMap.hashCode()
 
-  override def toString: String = toList.mkString("Bag(", ", ", ")")
+  override def toString(): String = toList.mkString("Bag(", ", ", ")")
 
   private def removeFirstOccurrence(ts: List[T], t: T): List[T] = {
     val indexOfFirstOccurrence = ts.indexOf(t)

@@ -16,7 +16,7 @@ import org.casa.battleships.fleet.{Bag, FleetLocation, ShipLocation}
 import org.casa.battleships.strategy.shooting.probabilistic._
 
 class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach with ShouldMatchers {
-  val duration: Duration = 1 second
+  val duration: Duration = 1.second
   implicit val timeout = Timeout(duration)
 
   var actorSystem: ActorSystem = _
@@ -71,7 +71,7 @@ class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach w
   }
 
   override def afterEach() {
-    actorSystem.shutdown
+    actorSystem.shutdown()
   }
 
   private def findThemAll(shipSizes: Bag[Int], availability: Set[Position]): Set[FleetLocation] = {

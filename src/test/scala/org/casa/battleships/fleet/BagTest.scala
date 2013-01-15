@@ -1,13 +1,12 @@
 package org.casa.battleships.fleet
 
 import org.scalatest.FunSuite
-import collection.mutable.Buffer
 import org.scalatest.matchers.ShouldMatchers
 
 class BagTest extends FunSuite with ShouldMatchers {
 
   test("Can go through it") {
-    val elements = Buffer[Int]()
+    val elements = collection.mutable.Buffer[Int]()
     for (i <- Bag(1, 1, 2, 4, 3)) {
       elements += i
     }
