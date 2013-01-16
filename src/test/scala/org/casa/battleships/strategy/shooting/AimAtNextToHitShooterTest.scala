@@ -16,7 +16,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
     val position: Position = pos(1, 1)
     val emptyHistory: List[(Position, ShotOutcome.Value)] = Nil
 
-    expect(None) {
+    expectResult(None) {
       new AimAtNextToHitShooter(chooser).shoot(Set(position), emptyHistory)
     }
   }
@@ -25,7 +25,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
     val position: Position = pos(1, 1)
     val history = (pos(3, 4), Water) :: (pos(4, 4), Sunk) :: Nil
 
-    expect(None) {
+    expectResult(None) {
       new AimAtNextToHitShooter(chooser).shoot(Set(position), history)
     }
   }
@@ -36,7 +36,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
 
     when(chooser.choose(isA(classOf[Set[Position]]))).thenReturn(None)
 
-    expect(None) {
+    expectResult(None) {
       new AimAtNextToHitShooter(chooser).shoot(Set(position), history)
     }
   }
@@ -47,7 +47,7 @@ class AimAtNextToHitShooterTest extends JUnitSuite {
 
     when(chooser.choose(isA(classOf[Set[Position]]))).thenReturn(Some(position))
 
-    expect(Some(position)) {
+    expectResult(Some(position)) {
       new AimAtNextToHitShooter(chooser).shoot(Set(position), history)
     }
   }

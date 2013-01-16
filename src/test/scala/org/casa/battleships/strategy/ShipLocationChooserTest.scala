@@ -13,34 +13,34 @@ class ShipLocationChooserTest extends JUnitSuite {
 
   @Test def possibleContinuationsAreUpRightDownLeftWhenThereIsOnlyOneChosenSquare {
     val r: Position = pos(2, 2)
-    expect(Set(r.up, r.right, r.down, r.left)) {
+    expectResult(Set(r.up, r.right, r.down, r.left)) {
       calculatePossibleContinuations(Set(r))
     }
   }
 
   @Test def possibleContinuationsAreNextLeftAndRightWhenThereAreSeveralHorizontallyChosen {
-    expect(Set(pos(1, 2), pos(4, 2))) {
+    expectResult(Set(pos(1, 2), pos(4, 2))) {
       calculatePossibleContinuations(Set(pos(2, 2), pos(3, 2)))
     }
   }
 
   @Test def possibleContinuationsAreNextUpAndDownWhenThereAreSeveralVerticallyChosen {
-    expect(Set(pos(2, 1), pos(2, 4))) {
+    expectResult(Set(pos(2, 1), pos(2, 4))) {
       calculatePossibleContinuations(Set(pos(2, 2), pos(2, 3)))
     }
   }
 
   @Test def takesAllWhenThatIsTheOnlyWay() {
-    expect(Some(new ShipLocation(Set(pos(2, 1), pos(3, 1))))) {
+    expectResult(Some(new ShipLocation(Set(pos(2, 1), pos(3, 1))))) {
       new ShipLocationChooser(chooser).place(2, Set(pos(2, 1), pos(3, 1)))
     }
   }
 
   @Test def failsToPlaceShipWhenThereIsNoSpace() {
-    expect(None) {
+    expectResult(None) {
       new ShipLocationChooser(chooser).place(2, Set(pos(2, 1)))
     }
-    expect(None) {
+    expectResult(None) {
       new ShipLocationChooser(chooser).place(2, Set[Position]())
     }
   }

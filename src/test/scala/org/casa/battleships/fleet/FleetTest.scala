@@ -15,7 +15,7 @@ class FleetTest extends JUnitSuite {
     val submarine = immaculateShip(pos(1, 4), pos(3, 4))
     val patrolBoat = immaculateShip(pos(1, 5), pos(2, 5))
 
-    expect(Set[Ship](aircraftCarrier, battleship, destroyer, submarine, patrolBoat)) {
+    expectResult(Set[Ship](aircraftCarrier, battleship, destroyer, submarine, patrolBoat)) {
       new Fleet(
         aircraftCarrier,
         battleship,
@@ -38,19 +38,19 @@ class FleetTest extends JUnitSuite {
 
   @Test def shipAtReturnsSomeShipWhenThereIsOneAtTheGivenPosition(){
     val aircraftCarrier = immaculateShip(pos(1, 1), pos(5, 1))
-    expect(Some(aircraftCarrier)){
+    expectResult(Some(aircraftCarrier)){
       fleetIncluding(aircraftCarrier).shipAt(pos(1,1))
     }
   }
 
   @Test def shipAtReturnsNoneWhenThereIsNoShipAtTheGivenPosition(){
-    expect(None){
+    expectResult(None){
       fleetWithoutShipAtTenTen.shipAt(pos(10,10))
     }
   }
 
   @Test def shootAtReturnsItselfPlusWaterIfThereIsNoShipInSuchPosition(){
-    expect((fleetWithoutShipAtTenTen, Water)){
+    expectResult((fleetWithoutShipAtTenTen, Water)){
       fleetWithoutShipAtTenTen.shootAt(pos(10, 10))
     }
   }
@@ -59,7 +59,7 @@ class FleetTest extends JUnitSuite {
     val newShip = immaculateShip(Set(pos(1, 1), pos(2, 1), pos(3, 1)))
     val fleet: Fleet = new Fleet(Set(newShip))
 
-    expect((new Fleet(Set(newShip.shootAt(pos(1, 1)))), Hit)) {
+    expectResult((new Fleet(Set(newShip.shootAt(pos(1, 1)))), Hit)) {
       fleet.shootAt(pos(1, 1))
     }
   }
@@ -70,7 +70,7 @@ class FleetTest extends JUnitSuite {
 
     val sunkShip: Ship = dodgyShip.shootAt(pos(3, 1))
 
-    expect((new Fleet(Set(sunkShip)), Sunk)) {
+    expectResult((new Fleet(Set(sunkShip)), Sunk)) {
       fleet.shootAt(pos(3, 1))
     }
   }
@@ -83,13 +83,13 @@ class FleetTest extends JUnitSuite {
       new Ship(new ShipLocation(ps.toSet), Set[Position]())
     }
 
-    expect(true) {
+    expectResult(true) {
       new Fleet(sunk(pos(1, 1), pos(2, 1)), sunk(pos(1, 2), pos(2, 2), pos(3, 2))).isSunk
     }
-    expect(false) {
+    expectResult(false) {
       new Fleet(sunk(pos(1, 1), pos(2, 1)), perfect(pos(1, 2), pos(2, 2), pos(3, 2))).isSunk
     }
-    expect(false) {
+    expectResult(false) {
       new Fleet(perfect(pos(1, 1), pos(2, 1)), perfect(pos(1, 2), pos(2, 2), pos(3, 2))).isSunk
     }
   }

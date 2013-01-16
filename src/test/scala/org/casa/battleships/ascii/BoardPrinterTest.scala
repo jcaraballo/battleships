@@ -20,7 +20,7 @@ class BoardPrinterTest extends JUnitSuite {
   }
 
   @Test def userBoard() {
-    expect(List(
+    expectResult(List(
     "  1 2 3 4  ",
     "  ~~~~~~~  ",
     "1{< * >  }1",
@@ -35,7 +35,7 @@ class BoardPrinterTest extends JUnitSuite {
   }
 
   @Test def computerBoard() {
-    expect(List(
+    expectResult(List(
       "  1 2 3 4  ",
       "  ~~~~~~~  ",
       "1{  *    }1",

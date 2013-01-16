@@ -23,7 +23,7 @@ class LinesShooterTest extends FunSuite {
 
     val history = (pos(7, 3), Hit) :: (pos(8, 2), Water) :: (pos(8, 4), Water) :: (pos(8, 3), Hit) :: Nil
 
-    expect(Some(pos(6, 3))){
+    expectResult(Some(pos(6, 3))){
       new LinesShooter(chooser).shoot(shootablePositions, history)
     }
   }

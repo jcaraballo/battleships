@@ -7,22 +7,22 @@ import org.scalatest.junit.JUnitSuite
 class ShipTest extends JUnitSuite {
   @Test def shootAtReturnsShipWithSuchPositionHit(){
     val location: ShipLocation = new ShipLocation(Set(pos(1, 1), pos(2, 1)))
-    expect(new Ship(location, Set(pos(1,1)))){
+    expectResult(new Ship(location, Set(pos(1,1)))){
       new Ship(location, Set()).shootAt(pos(1,1))
     }
   }
 
   @Test def isSunkIfAndOnlyIfAllSquaresHaveBeenHit(){
     val ship: Ship = new Ship(new ShipLocation(pos(1, 1), pos(2, 1)), Set())
-    expect(false){
+    expectResult(false){
       ship.isSunk
     }
 
-    expect(false){
+    expectResult(false){
       ship.shootAt(pos(1,1)).isSunk
     }
 
-    expect(true){
+    expectResult(true){
       ship.shootAt(pos(1,1)).shootAt(pos(2,1)).isSunk
     }
   }

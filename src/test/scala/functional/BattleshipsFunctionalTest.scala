@@ -10,7 +10,7 @@ class BattleshipsFunctionalTest extends JUnitSuite {
     configure using deterministicChooser
     configure using deterministicShooter
 
-    expect("""
+    expectResult("""
 ==========
 New Game
 ==========
@@ -33,7 +33,7 @@ New Game
 Enter your move:
 """){trimOnTheRight(start)}
 
-    expect("""
+    expectResult("""
 User: (1, 1) => Hit
 Computer: (1, 1) => Hit
 
@@ -56,7 +56,7 @@ Computer: (1, 1) => Hit
 Enter your move:
 """){trimOnTheRight(shoot(1, 1))}
 
-    expect("""
+    expectResult("""
 User: (2, 1) => Hit
 Computer: (1, 1) => Hit
 
@@ -82,7 +82,7 @@ Enter your move:
     shoot(3, 1)
     shoot(4, 1)
 
-    expect("""
+    expectResult("""
 User: (5, 1) => Sunk
 Computer: (1, 1) => Hit
 
@@ -105,7 +105,7 @@ Computer: (1, 1) => Hit
 Enter your move:
 """){trimOnTheRight(shoot(5, 1))}
 
-    expect("""
+    expectResult("""
 User: (10, 10) => Water
 Computer: (1, 1) => Hit
 
@@ -135,7 +135,7 @@ Enter your move:
     configure using deterministicChooser
     configure using deterministicShooter
 
-    expect("""
+    expectResult("""
 ==========
 New Game
 ==========
@@ -152,7 +152,7 @@ New Game
 Enter your move:
 """){trimOnTheRight(start)}
 
-    expect("""
+    expectResult("""
 User: (2, 2) => Water
 Computer: (1, 1) => Hit
 
@@ -169,7 +169,7 @@ Computer: (1, 1) => Hit
 Enter your move:
 """){trimOnTheRight(shoot(2, 2))}
 
-    expect("""
+    expectResult("""
 User: (4, 2) => Hit
 Computer: (1, 1) => Hit
 
@@ -190,7 +190,7 @@ Enter your move:
     shoot(3, 1)
     shoot(2, 1)
 
-    expect("""
+    expectResult("""
 User: (1, 1) => Sunk
 Computer: (1, 1) => Hit
 

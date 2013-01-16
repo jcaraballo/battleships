@@ -17,7 +17,7 @@ class AsciiDashboardTest extends JUnitSuite {
     val computerBoard: Board = new Board(4, smallFleet, shotPositions)
     val playerBoard: Board = new Board(4, smallFleet, shotPositions)
 
-    expect(
+    expectResult(
       "  Computer     You      \n" +
       "  1 2 3 4      1 2 3 4  \n" +
       "  ~~~~~~~      ~~~~~~~  \n" +

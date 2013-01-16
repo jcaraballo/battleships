@@ -18,7 +18,7 @@ class FleetComposerTest extends JUnitSuite {
       immaculateShip(pos(1, 2), pos(3, 2)),
       immaculateShip(pos(4, 2), pos(5, 2))
     )
-    expect(Some(expectedFleet)) {
+    expectResult(Some(expectedFleet)) {
       new FleetComposer(chooser).create(10, List(5, 4, 3, 3, 2))
     }
   }
