@@ -22,6 +22,8 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
   var actorSystem: ActorSystem = _
   var chooser: PositionChooser = _
 
+  implicit val timeout = Timeout(1 second)
+
   case class HasItBeenCalledExactlyOnce()
 
   test("Shoots none when master reponds with no possible fleet locations") {
@@ -42,13 +44,12 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
 
     when(chooser.choose(Set[Position]())).thenReturn(None)
 
-    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))(Timeout(1 second))
+    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))
 
     val shoot: Future[Option[Position]] = possibleShooter.shoot(availability, List())
     val result: Option[Position] = Await.result(shoot, 1 second)
     result should be(None)
 
-    implicit val timeout: Timeout = Timeout(1 second)
     val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
     Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
   }
@@ -71,18 +72,17 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
 
     when(chooser.choose(someFleetLocation.squares)).thenReturn(Some(pos(10, 10)))
 
-    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))(Timeout(1 second))
+    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))
 
     val shoot: Future[Option[Position]] = possibleShooter.shoot(availability, List())
     val result: Option[Position] = Await.result(shoot, 1 second)
     result should be(Some(pos(10, 10)))
 
-    implicit val timeout: Timeout = Timeout(1 second)
     val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
     Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
   }
 
-  test("Shoots one of the squares the fleet location responded by master, for no history") {
+  test("Shoots one of the squares of the fleet locations responded by master, for no history") {
     val availability: Set[Position] = createGrid(10)
 
     val master = actorSystem.actorOf(Props(new Actor {
@@ -102,13 +102,12 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
       someFleetLocation.squares ++ someOtherFleetLocation.squares
     )).thenReturn(Some(pos(10, 10)))
 
-    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))(Timeout(1 second))
+    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))
 
     val shoot: Future[Option[Position]] = possibleShooter.shoot(availability, List())
     val result: Option[Position] = Await.result(shoot, 1 second)
     result should be(Some(pos(10, 10)))
 
-    implicit val timeout: Timeout = Timeout(1 second)
     val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
     Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
   }
@@ -117,12 +116,12 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val history: List[(Position, ShotOutcome.Value)] = (pos(2, 1), Hit) ::(pos(1, 1), Hit) :: Nil
     val availability: Set[Position] = createGrid(10)
     val shootable: Set[Position] = availability - pos(1, 1) - pos(2, 1)
-    val compatibleFleetLocation: FleetLocation = FleetLocation(Set(
+    val compatibleFleetLocation = FleetLocation(Set(
       new ShipLocation(Set(pos(1, 1), pos(2, 1))),
       new ShipLocation(pos(6, 6), pos(10, 6)),
       new ShipLocation(pos(6, 7), pos(8, 7))
     ))
-    val incompatibleFleetLocation: FleetLocation = FleetLocation(Set(
+    val incompatibleFleetLocation = FleetLocation(Set(
       new ShipLocation(pos(6, 9), pos(10, 9)),
       new ShipLocation(pos(6, 10), pos(8, 10))
     ))
@@ -144,13 +143,12 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
       compatibleFleetLocation.squares
     )).thenReturn(Some(pos(10, 10)))
 
-    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))(Timeout(1 second))
+    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))
 
     val shoot: Future[Option[Position]] = possibleShooter.shoot(shootable, history)
     val result: Option[Position] = Await.result(shoot, 1 second)
     result should be(Some(pos(10, 10)))
 
-    implicit val timeout: Timeout = Timeout(1 second)
     val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
     Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
   }
@@ -161,6 +159,6 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
   }
 
   override def afterEach() {
-    actorSystem.shutdown
+    actorSystem.shutdown()
   }
 }
