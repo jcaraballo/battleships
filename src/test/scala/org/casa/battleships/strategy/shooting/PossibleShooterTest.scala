@@ -1,6 +1,6 @@
 package org.casa.battleships.strategy.shooting
 
-import akka.actor.{ActorSystem, Props, Actor}
+import akka.actor.{ActorRef, ActorSystem, Props, Actor}
 import akka.pattern.ask
 import org.mockito.Mockito._
 import akka.util.Timeout
@@ -24,23 +24,10 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
 
   implicit val timeout = Timeout(1 second)
 
-  case class HasItBeenCalledExactlyOnce()
-
   test("Shoots none when master reponds with no possible fleet locations") {
     val availability: Set[Position] = createGrid(10)
 
-    val master = actorSystem.actorOf(Props(new Actor {
-      var calledTimes: Int = 0
-
-      def receive = {
-        case MasterActor.Request(fleetConfigurations) if fleetConfigurations == Set(FleetConfiguration(availability)) => {
-          calledTimes += 1
-          sender ! MasterActor.Response(Set[FleetLocation]())
-        }
-        case HasItBeenCalledExactlyOnce() => sender ! (calledTimes == 1)
-        case e => akka.actor.Status.Failure(new AssertionError("Unexpected message sent to MasterActor: " + e))
-      }
-    }), name = "master")
+    val master = stubMaster(_.fleetConfigurations == Set(FleetConfiguration(availability)), MasterActor.Response(Set[FleetLocation]()))
 
     when(chooser.choose(Set[Position]())).thenReturn(None)
 
@@ -50,25 +37,13 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val result: Option[Position] = Await.result(shoot, 1 second)
     result should be(None)
 
-    val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
-    Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
+    ensureItHasBeenCalledExactlyOnce(master)
   }
 
   test("When master reponds with one fleet location, shoots one of the squares of said fleet location, for no history") {
     val availability: Set[Position] = createGrid(10)
 
-    val master = actorSystem.actorOf(Props(new Actor {
-      var calledTimes: Int = 0
-
-      def receive = {
-        case MasterActor.Request(fleetConfigurations) if fleetConfigurations == Set(FleetConfiguration(availability)) => {
-          calledTimes += 1
-          sender ! MasterActor.Response(Set[FleetLocation](someFleetLocation))
-        }
-        case HasItBeenCalledExactlyOnce() => sender ! (calledTimes == 1)
-        case e => akka.actor.Status.Failure(new AssertionError("Unexpected message sent to MasterActor: " + e))
-      }
-    }), name = "master")
+    val master = stubMaster(_.fleetConfigurations == Set(FleetConfiguration(availability)), MasterActor.Response(Set[FleetLocation](someFleetLocation)))
 
     when(chooser.choose(someFleetLocation.squares)).thenReturn(Some(pos(10, 10)))
 
@@ -78,25 +53,16 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val result: Option[Position] = Await.result(shoot, 1 second)
     result should be(Some(pos(10, 10)))
 
-    val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
-    Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
+    ensureItHasBeenCalledExactlyOnce(master)
   }
 
   test("Shoots one of the squares of the fleet locations responded by master, for no history") {
     val availability: Set[Position] = createGrid(10)
 
-    val master = actorSystem.actorOf(Props(new Actor {
-      var calledTimes: Int = 0
-
-      def receive = {
-        case MasterActor.Request(fleetConfigurations) if fleetConfigurations == Set(FleetConfiguration(availability)) => {
-          calledTimes += 1
-          sender ! MasterActor.Response(Set[FleetLocation](someFleetLocation, someOtherFleetLocation))
-        }
-        case HasItBeenCalledExactlyOnce() => sender ! (calledTimes == 1)
-        case e => akka.actor.Status.Failure(new AssertionError("Unexpected message sent to MasterActor: " + e))
-      }
-    }), name = "master")
+    val master = stubMaster(
+      _.fleetConfigurations == Set(FleetConfiguration(availability)),
+      MasterActor.Response(Set[FleetLocation](someFleetLocation, someOtherFleetLocation))
+    )
 
     when(chooser.choose(
       someFleetLocation.squares ++ someOtherFleetLocation.squares
@@ -108,8 +74,7 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val result: Option[Position] = Await.result(shoot, 1 second)
     result should be(Some(pos(10, 10)))
 
-    val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
-    Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
+    ensureItHasBeenCalledExactlyOnce(master)
   }
 
   test("Sends master availability=shootable+[hit or sunk in history] and shoots one of the squares of a responded fleet location compatible with the history") {
@@ -126,18 +91,8 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
       new ShipLocation(pos(6, 10), pos(8, 10))
     ))
 
-    val master = actorSystem.actorOf(Props(new Actor {
-      var calledTimes: Int = 0
-
-      def receive = {
-        case MasterActor.Request(fleetConfigurations) if fleetConfigurations == Set(FleetConfiguration(availability)) => {
-          calledTimes += 1
-          sender ! MasterActor.Response(Set[FleetLocation](compatibleFleetLocation, incompatibleFleetLocation))
-        }
-        case HasItBeenCalledExactlyOnce() => sender ! (calledTimes == 1)
-        case e => akka.actor.Status.Failure(new AssertionError("Unexpected message sent to MasterActor: " + e))
-      }
-    }), name = "master")
+    val master = stubMaster(_.fleetConfigurations == Set(FleetConfiguration(availability)),
+      MasterActor.Response(Set[FleetLocation](compatibleFleetLocation, incompatibleFleetLocation)))
 
     when(chooser.choose(
       compatibleFleetLocation.squares
@@ -149,8 +104,7 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
     val result: Option[Position] = Await.result(shoot, 1 second)
     result should be(Some(pos(10, 10)))
 
-    val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
-    Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
+    ensureItHasBeenCalledExactlyOnce(master)
   }
 
   override protected def beforeEach() {
@@ -160,5 +114,27 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
 
   override def afterEach() {
     actorSystem.shutdown()
+  }
+
+  case class HasItBeenCalledExactlyOnce()
+
+  def stubMaster(requestMatcher: MasterActor.Request => Boolean, response: => MasterActor.Response): ActorRef = {
+    actorSystem.actorOf(Props(new Actor {
+      var calledTimes: Int = 0
+
+      def receive = {
+        case MasterActor.Request(fleetConfigurations) if requestMatcher(MasterActor.Request(fleetConfigurations)) => {
+          calledTimes += 1
+          sender ! response
+        }
+        case HasItBeenCalledExactlyOnce() => sender ! (calledTimes == 1)
+        case e => akka.actor.Status.Failure(new AssertionError("Unexpected message sent to MasterActor: " + e))
+      }
+    }), name = "master")
+  }
+
+  def ensureItHasBeenCalledExactlyOnce(master: ActorRef) {
+    val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
+    Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
   }
 }
