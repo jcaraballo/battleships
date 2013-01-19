@@ -1,6 +1,7 @@
 package org.casa.battleships
 
 import ascii.AsciiDashboard
+import fleet.Bag
 import strategy.FleetComposer
 import org.casa.battleships.Position.pos
 import strategy.positionchoice.{RandomPositionChooser, PositionChooser, UpmostAndThenLeftmostPositionChooser}
@@ -8,6 +9,7 @@ import strategy.shooting._
 import org.casa.battleships.strategy.shooting.Shooters.bestShooter
 
 object Battleships {
+  val defaultShipSizes = Bag(5, 4, 3, 3, 2)
   var settings: GameSettings = _
   var dashboard: AsciiDashboard = _
 
@@ -27,20 +29,21 @@ object Battleships {
   }
 
   class GameSettings( var gridSize: Int,
-                      var shipSizes: List[Int],
+                      var shipSizes: Bag[Int],
                       var positionChooser: PositionChooser,
                       var computerShooter: Shooter){
-    def this() = this(10, 5::4::3::3::2::Nil, randomChooser, bestShooter(randomChooser))
+//    def this() = this(10, defaultShipSizes, randomChooser, newBestShooter(randomChooser, ActorSystem("MySystem"), defaultShipSizes, 10 seconds))
+    def this() = this(10, defaultShipSizes, randomChooser, bestShooter(randomChooser))
 
     def createDashboard(computerBoard: Board): AsciiDashboard = {
-      val userBoard = new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes).get)
+      val userBoard = new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes.toList).get)
       new AsciiDashboard(computerBoard, userBoard)
     }
   }
 
   def quickMode = new GameSettings {
     gridSize = 4
-    shipSizes = 3 :: 2 :: Nil
+    shipSizes = Bag(3, 2)
   }
 
   class GameConfigurer {
@@ -63,7 +66,7 @@ object Battleships {
   def configure: GameConfigurer = new GameConfigurer
 
   def start: String = {
-    computerPlayer = new ComputerPlayer(settings.positionChooser, settings.computerShooter, settings.gridSize, settings.shipSizes)
+    computerPlayer = new ComputerPlayer(settings.positionChooser, settings.computerShooter, settings.gridSize, settings.shipSizes.toList)
     outcomeOfTheLastComputerShotAtTheUser = None
 
     dashboard = settings.createDashboard(computerPlayer.board)
