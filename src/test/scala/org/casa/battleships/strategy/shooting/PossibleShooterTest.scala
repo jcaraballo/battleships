@@ -23,42 +23,31 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
   var chooser: PositionChooser = _
 
   implicit val timeout = Timeout(1 second)
+  val availability: Set[Position] = createGrid(10)
 
   test("Shoots none when master reponds with no possible fleet locations") {
-    val availability: Set[Position] = createGrid(10)
-
     val master = stubMaster(_.fleetConfigurations == Set(FleetConfiguration(availability)), MasterActor.Response(Set[FleetLocation]()))
 
     when(chooser.choose(Set[Position]())).thenReturn(None)
 
-    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))
-
-    val shoot: Future[Option[Position]] = possibleShooter.shoot(availability, List())
-    val result: Option[Position] = Await.result(shoot, 1 second)
-    result should be(None)
+    val possibleShooter = new PossibleShooter(chooser, master, Bag(3))
+    eventually(possibleShooter.shoot(availability, List())) should be(None)
 
     ensureItHasBeenCalledExactlyOnce(master)
   }
 
   test("When master reponds with one fleet location, shoots one of the squares of said fleet location, for no history") {
-    val availability: Set[Position] = createGrid(10)
-
     val master = stubMaster(_.fleetConfigurations == Set(FleetConfiguration(availability)), MasterActor.Response(Set[FleetLocation](someFleetLocation)))
 
     when(chooser.choose(someFleetLocation.squares)).thenReturn(Some(pos(10, 10)))
 
-    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))
-
-    val shoot: Future[Option[Position]] = possibleShooter.shoot(availability, List())
-    val result: Option[Position] = Await.result(shoot, 1 second)
-    result should be(Some(pos(10, 10)))
+    val possibleShooter = new PossibleShooter(chooser, master, Bag(3))
+    eventually(possibleShooter.shoot(availability, List())) should be(Some(pos(10, 10)))
 
     ensureItHasBeenCalledExactlyOnce(master)
   }
 
   test("Shoots one of the squares of the fleet locations responded by master, for no history") {
-    val availability: Set[Position] = createGrid(10)
-
     val master = stubMaster(
       _.fleetConfigurations == Set(FleetConfiguration(availability)),
       MasterActor.Response(Set[FleetLocation](someFleetLocation, someOtherFleetLocation))
@@ -68,18 +57,14 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
       someFleetLocation.squares ++ someOtherFleetLocation.squares
     )).thenReturn(Some(pos(10, 10)))
 
-    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))
-
-    val shoot: Future[Option[Position]] = possibleShooter.shoot(availability, List())
-    val result: Option[Position] = Await.result(shoot, 1 second)
-    result should be(Some(pos(10, 10)))
+    val possibleShooter = new PossibleShooter(chooser, master, Bag(3))
+    eventually(possibleShooter.shoot(availability, List())) should be(Some(pos(10, 10)))
 
     ensureItHasBeenCalledExactlyOnce(master)
   }
 
   test("Sends master availability=shootable+[hit or sunk in history] and shoots one of the squares of a responded fleet location compatible with the history") {
     val history: List[(Position, ShotOutcome.Value)] = (pos(2, 1), Hit) ::(pos(1, 1), Hit) :: Nil
-    val availability: Set[Position] = createGrid(10)
     val shootable: Set[Position] = availability - pos(1, 1) - pos(2, 1)
     val compatibleFleetLocation = FleetLocation(Set(
       new ShipLocation(Set(pos(1, 1), pos(2, 1))),
@@ -98,11 +83,8 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
       compatibleFleetLocation.squares
     )).thenReturn(Some(pos(10, 10)))
 
-    val possibleShooter: PossibleShooter = new PossibleShooter(chooser, master, Bag(3))
-
-    val shoot: Future[Option[Position]] = possibleShooter.shoot(shootable, history)
-    val result: Option[Position] = Await.result(shoot, 1 second)
-    result should be(Some(pos(10, 10)))
+    val possibleShooter = new PossibleShooter(chooser, master, Bag(3))
+    eventually(possibleShooter.shoot(shootable, history)) should be(Some(pos(10, 10)))
 
     ensureItHasBeenCalledExactlyOnce(master)
   }
@@ -136,5 +118,9 @@ class PossibleShooterTest extends FunSuite with BeforeAndAfterEach with ShouldMa
   def ensureItHasBeenCalledExactlyOnce(master: ActorRef) {
     val fut: Future[Any] = master ? HasItBeenCalledExactlyOnce()
     Await.result(fut, 1 second).asInstanceOf[Boolean] should be(true)
+  }
+
+  def eventually(shoot: Future[Option[Position]]): Option[Position] = {
+    Await.result(shoot, 1 second)
   }
 }
