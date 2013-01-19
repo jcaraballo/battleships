@@ -13,7 +13,7 @@ import ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 
 
-class NewBestShooter(chooser: PositionChooser, actorSystem2: ActorSystem, shipSizes: Bag[Int], timeoutDuration: FiniteDuration) extends Shooter {
+class NewBestShooter(chooser: PositionChooser, actorSystem: ActorSystem, shipSizes: Bag[Int], timeoutDuration: FiniteDuration) extends Shooter {
   def shoot(shootable: Set[Position], history: List[(Position, ShotOutcome.Value)]): Option[Position] = {
 //    val actorSystem = ActorSystem("MySystem")
 //    try {
