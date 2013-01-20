@@ -1,5 +1,6 @@
 package org.casa.battleships
 
+import ascii.AsciiDashboard
 import fleet.Fleet
 import fleet.Ship._
 import org.eclipse.jetty.server.Server
@@ -44,10 +45,25 @@ class ApiServer(port: Int, board: => Board) {
 
           val (outcome, nextPlayer) = games.get(game).get.shoot(shooter, pos(x, y))
 
-          val outcome1: String  = "" + outcome
+          val outcome1: String = "" + outcome
           val response = "" + outcome1 + "," + nextPlayer
           resp.getWriter.println(response)
         }
+      }
+
+      override def doGet(req: HttpServletRequest, resp: HttpServletResponse) {
+        // /game/:game_id/dashboard/:player_id
+        val parts = req.getRequestURI.substring(1).split('/')
+
+        val game = parts(1)
+        val dashboard = games.get(game).get
+
+        val player = parts(3)
+        val visibleBoard: Board = dashboard.playersToBoards.get(player).get
+
+        val response = new AsciiDashboard((dashboard.playersToBoards - player).head, player -> visibleBoard).toAscii
+
+        resp.getWriter.println(response)
       }
     }), "/game/*")
     server.setHandler(servletContextHandler)

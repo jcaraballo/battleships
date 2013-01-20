@@ -14,16 +14,89 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
   var apiServer: ApiServer = _
 
   test("creates games") {
-    Http(go("/game").POST << "bob,tim" OK as.String)().trim should be("1,bob")
-    Http(go("/game").POST << "bob,tim" OK as.String)().trim should be("2,bob")
+    Http(go("/game").POST << "Bob,Tim" OK as.String)().trim should be("1,Bob")
+    Http(go("/game").POST << "Bob,Tim" OK as.String)().trim should be("2,Bob")
   }
 
-  test("plays game") {
-    Http(go("/game").POST << "bob,tim" OK as.String)().trim should be("1,bob")
-    Http(go("/game/1/shot").POST << "bob,1,5" OK as.String)().trim should be("Hit,tim")
-    Http(go("/game/1/shot").POST << "tim,1,5" OK as.String)().trim should be("Hit,bob")
-    Http(go("/game/1/shot").POST << "bob,2,5" OK as.String)().trim should be("Sunk,tim")
-    Http(go("/game/1/shot").POST << "tim,3,5" OK as.String)().trim should be("Water,bob")
+  test("plays a game") {
+    Http(go("/game").POST << "Bob,Tim" OK as.String)().trim should be("1,Bob")
+
+    Http(go("/game/1/dashboard/Tim") OK as.String)().trim should be(
+      """
+        |  Bob                      Tim                  .
+        |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .
+        |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
+        |1{                   }1  1{< - - - >          }1.
+        |2{                   }2  2{< - - >            }2.
+        |3{                   }3  3{< - >              }3.
+        |4{                   }4  4{< - >              }4.
+        |5{                   }5  5{< >                }5.
+        |6{                   }6  6{                   }6.
+        |7{                   }7  7{                   }7.
+        |8{                   }8  8{                   }8.
+        |9{                   }9  9{                   }9.
+        |0{                   }0  0{                   }0.
+        |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
+        |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .""".stripMargin.filter(_ != '.').trim)
+
+    Http(go("/game/1/dashboard/Bob") OK as.String)().trim should be(
+      """
+        |  Tim                      Bob                  .
+        |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .
+        |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
+        |1{                   }1  1{< - - - >          }1.
+        |2{                   }2  2{< - - >            }2.
+        |3{                   }3  3{< - >              }3.
+        |4{                   }4  4{< - >              }4.
+        |5{                   }5  5{< >                }5.
+        |6{                   }6  6{                   }6.
+        |7{                   }7  7{                   }7.
+        |8{                   }8  8{                   }8.
+        |9{                   }9  9{                   }9.
+        |0{                   }0  0{                   }0.
+        |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
+        |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .""".stripMargin.filter(_ != '.').trim)
+
+    Http(go("/game/1/shot").POST << "Bob,1,5" OK as.String)().trim should be("Hit,Tim")
+
+    Http(go("/game/1/shot").POST << "Tim,1,5" OK as.String)().trim should be("Hit,Bob")
+    Http(go("/game/1/shot").POST << "Bob,2,5" OK as.String)().trim should be("Sunk,Tim")
+    Http(go("/game/1/shot").POST << "Tim,3,5" OK as.String)().trim should be("Water,Bob")
+
+    Http(go("/game/1/dashboard/Tim") OK as.String)().trim should be(
+      """
+        |  Bob                      Tim                  .
+        |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .
+        |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
+        |1{                   }1  1{< - - - >          }1.
+        |2{                   }2  2{< - - >            }2.
+        |3{                   }3  3{< - >              }3.
+        |4{                   }4  4{< - >              }4.
+        |5{* *                }5  5{* > ·              }5.
+        |6{                   }6  6{                   }6.
+        |7{                   }7  7{                   }7.
+        |8{                   }8  8{                   }8.
+        |9{                   }9  9{                   }9.
+        |0{                   }0  0{                   }0.
+        |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
+        |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .""".stripMargin.filter(_ != '.').trim)
+    Http(go("/game/1/dashboard/Bob") OK as.String)().trim should be(
+      """
+        |  Tim                      Bob                  .
+        |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .
+        |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
+        |1{                   }1  1{< - - - >          }1.
+        |2{                   }2  2{< - - >            }2.
+        |3{                   }3  3{< - >              }3.
+        |4{                   }4  4{< - >              }4.
+        |5{*   ·              }5  5{* *                }5.
+        |6{                   }6  6{                   }6.
+        |7{                   }7  7{                   }7.
+        |8{                   }8  8{                   }8.
+        |9{                   }9  9{                   }9.
+        |0{                   }0  0{                   }0.
+        |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
+        |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .""".stripMargin.filter(_ != '.').trim)
   }
 
   private def go(path: String): RequestBuilder = {

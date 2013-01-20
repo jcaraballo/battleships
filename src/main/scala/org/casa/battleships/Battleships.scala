@@ -21,23 +21,23 @@ object Battleships {
 
   var computerPlayer: ComputerPlayer = _
   var outcomeOfTheLastComputerShotAtTheUser: Option[ShotOutcome.Value] = None
-  
+
   reset
 
   def reset {
     settings = new GameSettings
   }
 
-  class GameSettings( var gridSize: Int,
-                      var shipSizes: Bag[Int],
-                      var positionChooser: PositionChooser,
-                      var computerShooter: Shooter){
-//    def this() = this(10, defaultShipSizes, randomChooser, newBestShooter(randomChooser, ActorSystem("MySystem"), defaultShipSizes, 5 seconds))
+  class GameSettings(var gridSize: Int,
+                     var shipSizes: Bag[Int],
+                     var positionChooser: PositionChooser,
+                     var computerShooter: Shooter) {
+    //    def this() = this(10, defaultShipSizes, randomChooser, newBestShooter(randomChooser, ActorSystem("MySystem"), defaultShipSizes, 5 seconds))
     def this() = this(10, defaultShipSizes, randomChooser, bestShooter(randomChooser))
 
     def createDashboard(computerBoard: Board): AsciiDashboard = {
       val userBoard = new Board(gridSize, new FleetComposer(positionChooser).create(gridSize, shipSizes.toList).get)
-      new AsciiDashboard(computerBoard, userBoard)
+      new AsciiDashboard("Computer" -> computerBoard, "You" -> userBoard)
     }
   }
 
@@ -82,8 +82,8 @@ object Battleships {
     }
 
     val positionWhereComputerShootsUser: Position = turn.shotBack
-    val computerShootsUserOutcome: ShotOutcome.Value = dashboard.userBoard.shoot(positionWhereComputerShootsUser)
-    
+    val computerShootsUserOutcome: ShotOutcome.Value = dashboard.playerAndVisibleBoard._2.shoot(positionWhereComputerShootsUser)
+
     outcomeOfTheLastComputerShotAtTheUser = Some(computerShootsUserOutcome)
 
     "\nUser: " + positionWhereUserShootsComputer + " => " + turn.lastShotOutcome +
@@ -99,9 +99,9 @@ object Battleships {
   }
 
   private def gameOutcome: Option[String] = {
-    if (dashboard.computerBoard.areAllShipsSunk) {
+    if (dashboard.playerAndHiddenBoard._2.areAllShipsSunk) {
       Some("\nYou win!\n")
-    } else if (dashboard.userBoard.areAllShipsSunk) {
+    } else if (dashboard.playerAndVisibleBoard._2.areAllShipsSunk) {
       Some("\nI win!\n")
     } else {
       None

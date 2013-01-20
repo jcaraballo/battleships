@@ -27,7 +27,7 @@ class AsciiDashboardTest extends JUnitSuite {
       "4{  ·   ·}4  4{  ·   ·}4\n" +
       "  ~~~~~~~      ~~~~~~~  \n" +
       "  1 2 3 4      1 2 3 4  \n"){
-      new AsciiDashboard(computerBoard, playerBoard).toAscii
+      new AsciiDashboard("Computer" -> computerBoard, "You" -> playerBoard).toAscii
     }
   }
 }
