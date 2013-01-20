@@ -32,7 +32,7 @@ object Battleships {
                       var shipSizes: Bag[Int],
                       var positionChooser: PositionChooser,
                       var computerShooter: Shooter){
-//    def this() = this(10, defaultShipSizes, randomChooser, newBestShooter(randomChooser, ActorSystem("MySystem"), defaultShipSizes, 10 seconds))
+//    def this() = this(10, defaultShipSizes, randomChooser, newBestShooter(randomChooser, ActorSystem("MySystem"), defaultShipSizes, 5 seconds))
     def this() = this(10, defaultShipSizes, randomChooser, bestShooter(randomChooser))
 
     def createDashboard(computerBoard: Board): AsciiDashboard = {

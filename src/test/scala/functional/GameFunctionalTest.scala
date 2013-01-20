@@ -1,6 +1,6 @@
 package functional
 
-import org.scalatest.{BeforeAndAfterEach, FunSuite}
+import org.scalatest.{BeforeAndAfterAll, FunSuite}
 import org.casa.battleships.Position.pos
 import org.casa.battleships.ShotOutcome.{Water, Hit}
 import org.junit.Assert.assertThat
@@ -16,7 +16,7 @@ import akka.actor.ActorSystem
 import org.casa.battleships.Turn
 import scala.concurrent.duration._
 
-class GameFunctionalTest extends FunSuite with BeforeAndAfterEach{
+class GameFunctionalTest extends FunSuite with BeforeAndAfterAll{
   val shipSizes: Bag[Int] = Bag(5)
   var actorSystem: ActorSystem = _
 
@@ -52,7 +52,11 @@ class GameFunctionalTest extends FunSuite with BeforeAndAfterEach{
     assertThat(computerPlayer.playFirstTurn(somePosition).shotBack, is(pos(1, 10)))
   }
 
-  override protected def beforeEach() {
+  override protected def beforeAll() {
     actorSystem = ActorSystem("MySystem")
+  }
+
+  override protected def afterAll() {
+    actorSystem.shutdown()
   }
 }

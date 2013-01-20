@@ -17,7 +17,7 @@ class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Acto
   def receive = {
     case Request(fleetConfigurations) =>
       originator = sender
-      log.info("Master received Request(" + fleetConfigurations + "), shipSizes: " + shipSizes)
+//      log.info("Master received Request(" + fleetConfigurations + "), shipSizes: " + shipSizes)
       try {
         process(fleetConfigurations)
       }
@@ -29,11 +29,11 @@ class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Acto
       }
 
     case WorkerActor.Response(originalFleetConfiguration, newFleetConfigurations) => {
-      log.info("Master received WorkerActor.Response(" + newFleetConfigurations + ")")
+//      log.info("Master received WorkerActor.Response(" + newFleetConfigurations + ")")
       try {
-        log.info("Removing processed fleet configuration " + originalFleetConfiguration)
+//        log.info("Removing processed fleet configuration " + originalFleetConfiguration)
         fleets -= originalFleetConfiguration
-        log.info("Fleets have been updated to: " + fleets)
+//        log.info("Fleets have been updated to: " + fleets)
         process(newFleetConfigurations)
       }
       catch {
