@@ -3,7 +3,7 @@ package org.casa.battleships
 import ascii.AsciiDashboard
 import fleet.Fleet
 import fleet.Ship._
-import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.server.{ServerConnector, Server}
 import org.eclipse.jetty.servlet.{ServletHolder, ServletContextHandler}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 import java.util.concurrent.atomic.AtomicInteger
@@ -13,6 +13,8 @@ import org.apache.commons.io.IOUtils
 import scala.Predef._
 
 class ApiServer(port: Int, board: => Board) {
+  def this(board: Board) = this(0, board)
+
   val server = new Server(port)
 
   var games: Map[String, Dashboard] = Map()
@@ -78,9 +80,13 @@ class ApiServer(port: Int, board: => Board) {
     }), "/game/*")
     server.setHandler(servletContextHandler)
     server.start()
+    println("Server started on port " + getPort)
     this
   }
 
+  def getPort: Int = {
+    server.getConnectors.head.asInstanceOf[ServerConnector].getLocalPort
+  }
 
   def stop() {
     server.stop()
