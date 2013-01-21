@@ -20,6 +20,7 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
 
   test("plays a game") {
     Http(go("/game").POST << "Bob,Tim" OK as.String)().trim should be("1,Bob")
+    Http(go("/game/1/history") OK as.String)().trim should be("")
 
     Http(go("/game/1/dashboard/Tim") OK as.String)().trim should be(
       """
@@ -58,8 +59,12 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
         |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .""".stripMargin.filter(_ != '.').trim)
 
     Http(go("/game/1/shot").POST << "Bob,1,5" OK as.String)().trim should be("Hit,Tim")
-
     Http(go("/game/1/shot").POST << "Tim,1,5" OK as.String)().trim should be("Hit,Bob")
+
+    Http(go("/game/1/history") OK as.String)().trim should be("" +
+      "Bob: (1, 5) => Hit\n" +
+      "Tim: (1, 5) => Hit")
+
     Http(go("/game/1/shot").POST << "Bob,2,5" OK as.String)().trim should be("Sunk,Tim")
     Http(go("/game/1/shot").POST << "Tim,3,5" OK as.String)().trim should be("Water,Bob")
 
@@ -97,6 +102,11 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
         |0{                   }0  0{                   }0.
         |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
         |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .""".stripMargin.filter(_ != '.').trim)
+    Http(go("/game/1/history") OK as.String)().trim should be("" +
+      "Bob: (1, 5) => Hit\n"+
+      "Tim: (1, 5) => Hit\n" +
+      "Bob: (2, 5) => Sunk\n" +
+      "Tim: (3, 5) => Water")
   }
 
   private def go(path: String): RequestBuilder = {

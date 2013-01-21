@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger
 import org.casa.battleships.Position._
 import java.io.StringWriter
 import org.apache.commons.io.IOUtils
+import scala.Predef._
 
 class ApiServer(port: Int, board: => Board) {
   val server = new Server(port)
@@ -52,18 +53,27 @@ class ApiServer(port: Int, board: => Board) {
       }
 
       override def doGet(req: HttpServletRequest, resp: HttpServletResponse) {
-        // /game/:game_id/dashboard/:player_id
         val parts = req.getRequestURI.substring(1).split('/')
-
         val game = parts(1)
         val dashboard = games.get(game).get
 
-        val player = parts(3)
-        val visibleBoard: Board = dashboard.playersToBoards.get(player).get
+        if ("dashboard" == parts(2)) {
+          // /game/:game_id/dashboard/:player_id
 
-        val response = new AsciiDashboard((dashboard.playersToBoards - player).head, player -> visibleBoard).toAscii
+          val player = parts(3)
+          val visibleBoard: Board = dashboard.playersToBoards.get(player).get
 
-        resp.getWriter.println(response)
+          val response = new AsciiDashboard((dashboard.playersToBoards - player).head, player -> visibleBoard).toAscii
+
+          resp.getWriter.println(response)
+        } else {
+          // /game/:game_id/history
+          dashboard.history.reverse.foreach {
+            turn: (String, Position, ShotOutcome.Value) =>
+              resp.getWriter.println(turn._1 + ": " + turn._2 + " => " + turn._3)
+          }
+
+        }
       }
     }), "/game/*")
     server.setHandler(servletContextHandler)
