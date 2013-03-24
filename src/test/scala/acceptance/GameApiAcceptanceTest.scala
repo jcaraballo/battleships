@@ -4,7 +4,6 @@ import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import dispatch._
 import org.scalatest.matchers.ShouldMatchers
 import org.casa.battleships._
-import fleet.Fleet
 import org.casa.battleships.fleet.Ship._
 import org.casa.battleships.Position._
 import org.casa.battleships.fleet.Fleet
