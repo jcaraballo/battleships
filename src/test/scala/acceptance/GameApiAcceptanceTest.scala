@@ -3,11 +3,13 @@ package acceptance
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import dispatch._
 import org.scalatest.matchers.ShouldMatchers
-import org.casa.battleships.{Board, ApiServer}
+import org.casa.battleships._
+import fleet.Fleet
 import org.casa.battleships.fleet.Ship._
 import org.casa.battleships.Position._
 import org.casa.battleships.fleet.Fleet
 import com.ning.http.client.RequestBuilder
+import org.casa.battleships.strategy.shooting.OneOneShooter
 
 
 class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach {
@@ -107,6 +109,33 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
       "Tim: (1, 5) => Hit\n" +
       "Bob: (2, 5) => Sunk\n" +
       "Tim: (3, 5) => Water")
+  }
+
+  test("Computer plays using /game web service") {
+    val shooter: OneOneShooter = new OneOneShooter()
+
+    Http(go("/game").POST << "Bob,Computer" OK as.String)().trim should be("1,Bob")
+    Http(go("/game/1/shot").POST << "Bob,1,5" OK as.String)().trim should be("Hit,Computer")
+
+    val history: Array[String] = Http(go("/game/1/history") OK as.String)().trim.split("\n")
+    val opponentsPrefix: String = "Bob: "
+    val opponentsHistory: List[(Position, ShotOutcome.Value)] = history.toList.filter(_.startsWith(opponentsPrefix)).map(s => {
+      val split: Array[String] = s.substring(opponentsPrefix.length).split(" => ")
+      val shotPart: String = split(0)
+      val coordinates: Array[String] = shotPart.substring(1, shotPart.length - 1).split(", ")
+      val shot: Position = pos(coordinates(0).toInt, coordinates(1).toInt)
+      val outcome: ShotOutcome.Value = split(1) match {
+        case "Hit" => ShotOutcome.Hit
+        case "Water" => ShotOutcome.Water
+        case "Sunk" => ShotOutcome.Sunk
+        case _ => throw new IllegalArgumentException
+      }
+      (shot, outcome)
+    }).toList
+
+    val computerShot = shooter.shoot(Positions.createGrid(10) -- opponentsHistory.map(_._1), opponentsHistory).get
+
+    Http(go("/game/1/shot").POST << "Computer," + computerShot.column + "," + computerShot.row OK as.String)().trim should be("Hit,Bob")
   }
 
   private def go(path: String): RequestBuilder = {
