@@ -77,7 +77,7 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
         |2{                   }2  2{< - - >            }2.
         |3{                   }3  3{< - >              }3.
         |4{                   }4  4{< - >              }4.
-        |5{* *                }5  5{* > ·              }5.
+        |5{*   ·              }5  5{* *                }5.
         |6{                   }6  6{                   }6.
         |7{                   }7  7{                   }7.
         |8{                   }8  8{                   }8.
@@ -94,7 +94,7 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
         |2{                   }2  2{< - - >            }2.
         |3{                   }3  3{< - >              }3.
         |4{                   }4  4{< - >              }4.
-        |5{*   ·              }5  5{* *                }5.
+        |5{* *                }5  5{* > ·              }5.
         |6{                   }6  6{                   }6.
         |7{                   }7  7{                   }7.
         |8{                   }8  8{                   }8.
@@ -103,7 +103,7 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
         |  ~~~~~~~~~~~~~~~~~~~      ~~~~~~~~~~~~~~~~~~~  .
         |  1 2 3 4 5 6 7 8 9 0      1 2 3 4 5 6 7 8 9 0  .""".stripMargin.filter(_ != '.').trim)
     Http(go("/game/1/history") OK as.String)().trim should be("" +
-      "Bob: (1, 5) => Hit\n"+
+      "Bob: (1, 5) => Hit\n" +
       "Tim: (1, 5) => Hit\n" +
       "Bob: (2, 5) => Sunk\n" +
       "Tim: (3, 5) => Water")

@@ -63,10 +63,13 @@ class ApiServer(port: Int, board: => Board) {
           // /game/:game_id/dashboard/:player_id
 
           val player = parts(3)
+
           val visibleBoard: Board = dashboard.playersToBoards.get(player).get
+          val thisPlayerWithVisibleBoard = player -> visibleBoard
 
-          val response = new AsciiDashboard((dashboard.playersToBoards - player).head, player -> visibleBoard).toAscii
+          val otherPlayerWithHiddenBoard = (dashboard.playersToBoards - player).head
 
+          val response = new AsciiDashboard(otherPlayerWithHiddenBoard, thisPlayerWithVisibleBoard).toAscii
           resp.getWriter.println(response)
         } else {
           // /game/:game_id/history
@@ -74,7 +77,6 @@ class ApiServer(port: Int, board: => Board) {
             turn: (String, Position, ShotOutcome.Value) =>
               resp.getWriter.println(turn._1 + ": " + turn._2 + " => " + turn._3)
           }
-
         }
       }
     }), "/game/*")
