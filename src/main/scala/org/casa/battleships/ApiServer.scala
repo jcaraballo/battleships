@@ -13,7 +13,7 @@ import org.apache.commons.io.IOUtils
 import scala.Predef._
 
 class ApiServer(port: Int, board: => Board) {
-  def this(board: Board) = this(0, board)
+  def this(board: => Board) = this(0, board)
 
   val server = new Server(port)
 

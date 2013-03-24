@@ -110,11 +110,11 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
   }
 
   private def go(path: String): RequestBuilder = {
-    url("http://localhost:8080" + path)
+    url("http://localhost:" + apiServer.getPort + path)
   }
 
   override def beforeEach() {
-    apiServer = new ApiServer(8080, new Board(10, new Fleet(
+    apiServer = new ApiServer(new Board(10, new Fleet(
       immaculateShip(pos(1, 1), pos(5, 1)),
       immaculateShip(pos(1, 2), pos(4, 2)),
       immaculateShip(pos(1, 3), pos(3, 3)),
