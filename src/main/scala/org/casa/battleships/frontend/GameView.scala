@@ -18,7 +18,6 @@ class GameView(val transport: Transport, val playerId: String) {
     ShotOutcome.LookUp.fromString(parts(0))
   }
 
-
   def historyOfShotsOnOpponent(): List[(Position, ShotOutcome.Value)] = {
     val history: Array[String] = transport.get("/history").trim.split("\n")
     val opponentsPrefix: String = playerId + ": "
