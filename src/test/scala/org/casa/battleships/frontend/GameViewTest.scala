@@ -62,6 +62,20 @@ class GameViewTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach 
     computerView.dashboard() shouldBe (dashboard2)
   }
 
+  test("Gets the winner when there is one") {
+    when(gameTransport.getWithStatusCode("/winner")).thenReturn((200, "You"))
+    val view = setupHumanGameView()
+
+    view.winner() shouldBe Some("You")
+  }
+
+  test("It doesn't get the winner when there none yet") {
+    when(gameTransport.getWithStatusCode("/winner")).thenReturn((404, "ignored"))
+    val view = setupHumanGameView()
+
+    view.winner() shouldBe None
+  }
+
   private def setupHumanGameView(): GameView = {
     setupGameViews._1
   }

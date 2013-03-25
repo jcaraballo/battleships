@@ -32,6 +32,14 @@ class GameView(val transport: Transport, val playerId: String) {
     opponentsHistory
   }
 
+  def winner(): Option[String] = {
+    transport.getWithStatusCode("/winner") match {
+      case (200, response) => Some(response)
+      case (404, _) => None
+      case (code, response) => throw new RuntimeException("Unexpected response " +(code, response))
+    }
+  }
+
   private def opponentsId = if ("Computer" == playerId) "You" else "Computer"
 }
 
