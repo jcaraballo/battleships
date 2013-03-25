@@ -71,13 +71,19 @@ class ApiServer(port: Int, board: => Board) {
 
           val response = new AsciiDashboard(otherPlayerWithHiddenBoard, thisPlayerWithVisibleBoard).toAscii
           resp.getWriter.println(response)
-        } else {
+        } else if ("history" == parts(2)) {
           // /game/:game_id/history
           dashboard.history.reverse.foreach {
             turn: (String, Position, ShotOutcome.Value) =>
               resp.getWriter.println(turn._1 + ": " + turn._2 + " => " + turn._3)
           }
-        }
+        } else if ("winner" == parts(2)) {
+          dashboard.playersToBoards.find(_._2.areAllShipsSunk) match {
+            case Some((player, _)) => resp.getWriter.println(dashboard.opponent(player))
+            case None => resp.setStatus(404)
+          }
+        } else
+          resp.setStatus(404)
       }
     }), "/game/*")
     server.setHandler(servletContextHandler)

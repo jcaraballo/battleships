@@ -7,7 +7,7 @@ import org.casa.battleships._
 import org.casa.battleships.fleet.Ship._
 import org.casa.battleships.Position._
 import org.casa.battleships.fleet.Fleet
-import com.ning.http.client.RequestBuilder
+import com.ning.http.client.{Response, RequestBuilder}
 import org.casa.battleships.strategy.shooting.OneOneShooter
 
 
@@ -108,6 +108,16 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
       "Tim: (1, 5) => Hit\n" +
       "Bob: (2, 5) => Sunk\n" +
       "Tim: (3, 5) => Water")
+
+    Http(go("/game/1/winner"))().getStatusCode shouldBe 404
+
+    // Bob wins over Tim
+    for (column <- 1 to 5; row <- 1 to 5 if (!(column == 1 && row == 5) && !(column == 2 && row == 5)))
+      Http(go("/game/1/shot").POST << ("Bob," + column + "," + row))()
+
+    val winnerResponse: Response = Http(go("/game/1/winner"))()
+    winnerResponse.getStatusCode shouldBe 200
+    winnerResponse.getResponseBody.trim shouldBe "Bob"
   }
 
   test("Computer plays using /game web service") {
