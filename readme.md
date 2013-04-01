@@ -22,11 +22,11 @@ Instructions
 
 * Start the game
 
-        scala> start
+        scala> st
 
 * The user shoots with
 
-        scala> shoot(3, 4)
+        scala> s(3, 4)
 
 * Once done, shutdown the server with
 
@@ -38,10 +38,13 @@ Additionally
 
 * The game can be restarted at any point with
 
-        scala> start
+        scala> st
 
 * There is a quick mode, handy for (automated or exploratory) testing, with a 4x4 grid and only a couple of ships. To configure the game in quick mode:
 
+
+        scala> server.stop
+        scala> val server = new org.casa.battleships.ApiServer(8080, new org.casa.battleships.Board(4, new org.casa.battleships.strategy.FleetComposer(randomChooser).create(4, 3 ::2 :: Nil).get)).start
         scala> configure using quickMode
 
 * The configuration can be reset with

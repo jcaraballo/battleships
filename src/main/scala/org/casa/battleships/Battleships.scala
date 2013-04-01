@@ -100,4 +100,7 @@ object Battleships {
   private def normalPrompt: String = {
     "\n" + playerGameView.dashboard + "Enter your move:\n"
   }
+
+  def st{println(start)}
+  def s(column: Int, row: Int){println(shoot(column, row))}
 }
