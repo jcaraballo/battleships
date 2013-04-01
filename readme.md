@@ -12,6 +12,10 @@ Instructions
 
         > console
 
+* Start the game server
+
+        scala> val server = new org.casa.battleships.ApiServer().start
+
 * Import DSL
 
         scala> import org.casa.battleships.Battleships._
@@ -23,6 +27,10 @@ Instructions
 * The user shoots with
 
         scala> shoot(3, 4)
+
+* Once done, shutdown the server with
+
+        scala> server.stop
 
 
 Additionally

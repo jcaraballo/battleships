@@ -19,7 +19,7 @@ class GameViewTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach 
   }
 
   test("Subs transport on game creation") {
-    when(generalTransport.post("/game", "You,Computer")).thenReturn("1,You")
+    when(generalTransport.post("/game", "You,Computer")).thenReturn("1,You\n")
     when(generalTransport.sub("/game/1")).thenReturn(gameTransport)
 
     val (playerGameView, computerGameView) = GameView.createGame(generalTransport)
@@ -32,7 +32,7 @@ class GameViewTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach 
   }
 
   test("Creates shot and returns outcome when shooting") {
-    when(gameTransport.post("/shot", "You,1,5")).thenReturn("Hit,ignored")
+    when(gameTransport.post("/shot", "You,1,5")).thenReturn("Hit,ignored\n")
 
     val view = setupHumanGameView()
 
@@ -42,7 +42,7 @@ class GameViewTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach 
   test("Selects the history of shots on the opponent when retrieving history") {
     when(gameTransport.get("/history")).thenReturn("" +
       "You: (1, 5) => Hit\n" +
-      "Computer: (9, 9) => Water")
+      "Computer: (9, 9) => Water\n")
 
     val humanView = setupHumanGameView()
     humanView.historyOfShotsOnOpponent() shouldBe (pos(1, 5), ShotOutcome.Hit) :: Nil
@@ -63,7 +63,7 @@ class GameViewTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach 
   }
 
   test("Gets the winner when there is one") {
-    when(gameTransport.getWithStatusCode("/winner")).thenReturn((200, "You"))
+    when(gameTransport.getWithStatusCode("/winner")).thenReturn((200, "You\n"))
     val view = setupHumanGameView()
 
     view.winner() shouldBe Some("You")
@@ -85,7 +85,7 @@ class GameViewTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach 
   }
 
   private def setupGameViews: (GameView, GameView) = {
-    when(generalTransport.post("/game", "You,Computer")).thenReturn("1,You")
+    when(generalTransport.post("/game", "You,Computer")).thenReturn("1,You\n")
     when(generalTransport.sub("/game/1")).thenReturn(gameTransport)
 
     GameView.createGame(generalTransport)

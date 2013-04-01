@@ -9,7 +9,7 @@ class GameView(val transport: Transport, val playerId: String) {
   }
 
   def shootOpponent(column: Int, row: Int): ShotOutcome.Value = {
-    val body = transport.post("/shot", playerId + "," + column + "," + row)
+    val body = transport.post("/shot", playerId + "," + column + "," + row).trim
     if (!body.contains(",")) throw new IllegalArgumentException
 
     val parts: Array[String] = body.split(",")
@@ -34,7 +34,7 @@ class GameView(val transport: Transport, val playerId: String) {
 
   def winner(): Option[String] = {
     transport.getWithStatusCode("/winner") match {
-      case (200, response) => Some(response)
+      case (200, response) => Some(response.trim)
       case (404, _) => None
       case (code, response) => throw new RuntimeException("Unexpected response " +(code, response))
     }
@@ -45,7 +45,7 @@ class GameView(val transport: Transport, val playerId: String) {
 
 object GameView {
   def createGame(transport: Transport): (GameView, GameView) = {
-    val result: String = transport.post("/game", "You,Computer")
+    val result: String = transport.post("/game", "You,Computer").trim
     if (!result.endsWith(",You")) throw new RuntimeException("Expected response ending in ',You', but got: " + result)
 
     val gameId: Int = result.substring(0, result.length - ",You".length).toInt

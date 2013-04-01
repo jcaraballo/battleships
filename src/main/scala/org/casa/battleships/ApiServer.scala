@@ -1,8 +1,7 @@
 package org.casa.battleships
 
 import ascii.AsciiDashboard
-import fleet.Fleet
-import fleet.Ship._
+import fleet.Bag
 import org.eclipse.jetty.server.{ServerConnector, Server}
 import org.eclipse.jetty.servlet.{ServletHolder, ServletContextHandler}
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
@@ -11,9 +10,13 @@ import org.casa.battleships.Position._
 import java.io.StringWriter
 import org.apache.commons.io.IOUtils
 import scala.Predef._
+import strategy.FleetComposer
+import strategy.positionchoice.RandomPositionChooser
+import scala.Some
 
 class ApiServer(port: Int, board: => Board) {
   def this(board: => Board) = this(0, board)
+  def this() = this(8080, new Board(10, new FleetComposer(new RandomPositionChooser()).create(10, Bag(5, 4, 3, 3, 2).toList).get))
 
   val server = new Server(port)
 
@@ -113,13 +116,9 @@ class ApiServer(port: Int, board: => Board) {
 
 object ApiServer {
   def main(args: Array[String]) {
-    val server: ApiServer = new ApiServer(8080, new Board(10, new Fleet(
-      immaculateShip(pos(1, 1), pos(5, 1)),
-      immaculateShip(pos(1, 2), pos(4, 2)),
-      immaculateShip(pos(1, 3), pos(3, 3)),
-      immaculateShip(pos(1, 4), pos(3, 4)),
-      immaculateShip(pos(1, 5), pos(2, 5))
-    ))).start()
+    val server = new ApiServer
+    server.start()
+
     server.join()
   }
 }

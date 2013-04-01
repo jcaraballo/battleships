@@ -1,13 +1,27 @@
 package functional
 
 import org.casa.battleships.Battleships._
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfterEach, FunSuite}
+import org.casa.battleships.{Board, ApiServer}
+import org.casa.battleships.strategy.FleetComposer
+import org.casa.battleships.strategy.positionchoice.UpmostAndThenLeftmostPositionChooser
+import org.casa.battleships.fleet.Bag
+import org.casa.battleships.frontend.Transport
 
-class BattleshipsFunctionalTest extends FunSuite {
+class BattleshipsFunctionalTest extends FunSuite with BeforeAndAfterEach {
+  var server: ApiServer = _
+
+  override def afterEach() {
+    server.stop()
+  }
+
   test("plays") {
+    server = new ApiServer(new Board(10, new FleetComposer(new UpmostAndThenLeftmostPositionChooser).create(10, Bag(5, 4, 3, 3, 2).toList).get))
+    server.start()
+
     reset
-    configure using deterministicChooser
     configure using deterministicShooter
+    configure using new Transport("http://localhost:"+server.getPort)
 
     expectResult("""
 ==========
@@ -129,10 +143,13 @@ Enter your move:
   }
 
   test("playsQuickMode"){
+    server = new ApiServer(new Board(4, new FleetComposer(new UpmostAndThenLeftmostPositionChooser).create(4, Bag(3, 2).toList).get))
+    server.start()
+
     reset
     configure using quickMode
-    configure using deterministicChooser
     configure using deterministicShooter
+    configure using new Transport("http://localhost:"+server.getPort)
 
     expectResult("""
 ==========
