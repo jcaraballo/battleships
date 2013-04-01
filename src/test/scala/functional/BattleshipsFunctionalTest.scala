@@ -1,11 +1,10 @@
 package functional
 
-import org.junit.Test
-import org.scalatest.junit.JUnitSuite
 import org.casa.battleships.Battleships._
+import org.scalatest.FunSuite
 
-class BattleshipsFunctionalTest extends JUnitSuite {
-  @Test def plays() {
+class BattleshipsFunctionalTest extends FunSuite {
+  test("plays") {
     reset
     configure using deterministicChooser
     configure using deterministicShooter
@@ -129,7 +128,7 @@ Enter your move:
 """){trimOnTheRight(shoot(10, 10))}
   }
 
-  @Test def playsQuickMode(){
+  test("playsQuickMode"){
     reset
     configure using quickMode
     configure using deterministicChooser
