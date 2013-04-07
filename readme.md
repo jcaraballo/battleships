@@ -55,7 +55,7 @@ For other options (deterministic algorithms, etc) see BattleshipsFunctionalTest.
 
 API
 ---
-You can use a web service on `/game` for a multi-player game (hardcoded board at the moment)
+You can use a web service on `/game` for a multi-player game 
 
 * Start ApiServer
 
