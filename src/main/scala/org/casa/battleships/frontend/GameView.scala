@@ -8,6 +8,24 @@ class GameView(val transport: Transport, val playerId: String) {
     transport.get("/dashboard/" + playerId)
   }
 
+  def myFleet(): Map[Position, String] = {
+    val dash: String = dashboard()
+
+    val payload: Array[String] = dash.trim.split('\n').map {
+      line =>
+        val leftBorder = line.lastIndexOf("{")
+        val rightBorder = line.lastIndexOf("}")
+        if (leftBorder == -1 || rightBorder == -1) None else Some(line.substring(leftBorder + 1, rightBorder))
+    }.flatten.map(_.zipWithIndex.filter(_._2 % 2 == 0).map(_._1).mkString)
+
+    val entries = payload.zipWithIndex.map {
+      lineAndIndex => lineAndIndex._1.zipWithIndex.map {
+        charAndIndex => pos(charAndIndex._2 + 1, lineAndIndex._2 + 1) -> charAndIndex._1.toString
+      }
+    }.flatten
+    Map(entries: _*)
+  }
+
   def shootOpponent(column: Int, row: Int): ShotOutcome.Value = {
     val body = transport.post("/shot", playerId + "," + column + "," + row).trim
     if (!body.contains(",")) throw new IllegalArgumentException

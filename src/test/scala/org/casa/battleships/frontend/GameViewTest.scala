@@ -62,6 +62,31 @@ class GameViewTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach 
     computerView.dashboard() shouldBe (dashboard2)
   }
 
+  test("Fleet converts the visible dashboard into a map") {
+    when(gameTransport.get("/dashboard/You")).thenReturn(
+      """
+        |  Bob            Tim        .
+        |  1 2 3 4 5      1 2 3 4 5  .
+        |  ~~~~~~~~~      ~~~~~~~~~  .
+        |1{         }1  1{< - - - >}1.
+        |2{         }2  2{< - - > ^}2.
+        |3{         }3  3{< - >   |}3.
+        |4{         }4  4{< >     v}4.
+        |5{         }5  5{         }5.
+        |  ~~~~~~~~~      ~~~~~~~~~  .
+        |  1 2 3 4 5      1 2 3 4 5  .""".stripMargin.filter(_ != '.').trim)
+
+    val humanView = setupHumanGameView()
+
+    humanView.myFleet shouldBe Map(
+      pos(1, 1) -> "<", pos(2, 1) -> "-", pos(3, 1) -> "-", pos(4, 1) -> "-", pos(5, 1) -> ">",
+      pos(1, 2) -> "<", pos(2, 2) -> "-", pos(3, 2) -> "-", pos(4, 2) -> ">", pos(5, 2) -> "^",
+      pos(1, 3) -> "<", pos(2, 3) -> "-", pos(3, 3) -> ">", pos(4, 3) -> " ", pos(5, 3) -> "|",
+      pos(1, 4) -> "<", pos(2, 4) -> ">", pos(3, 4) -> " ", pos(4, 4) -> " ", pos(5, 4) -> "v",
+      pos(1, 5) -> " ", pos(2, 5) -> " ", pos(3, 5) -> " ", pos(4, 5) -> " ", pos(5, 5) -> " "
+    )
+  }
+
   test("Gets the winner when there is one") {
     when(gameTransport.getWithStatusCode("/winner")).thenReturn((200, "You\n"))
     val view = setupHumanGameView()
