@@ -61,8 +61,7 @@ object Gui extends SimpleSwingApplication {
       contents ++= userSquareButtons.values
     }
 
-    val logListView = new LogListView() {
-    }
+    val logPanel = new LogPanel
 
     contents = new BoxPanel(Orientation.Vertical) {
       contents += new BoxPanel(Orientation.Horizontal) {
@@ -89,7 +88,7 @@ object Gui extends SimpleSwingApplication {
         border = Swing.EmptyBorder(5, 10, 5, 10)
       }
 
-      contents += new ScrollPane(logListView)
+      contents += logPanel
     }
 
     reactions += {
@@ -104,10 +103,10 @@ object Gui extends SimpleSwingApplication {
 
         userSquareButtons(computerOnHumanShot).text = outcomeToSquareText(computerOnHumanShotOutcome)
 
-        logListView.addLines(
+        logPanel.addLines(
           "User: " + humanOnComputerShot + " => " + humanOnComputerShotOutcome,
           "Computer: " + computerOnHumanShot + " => " + computerOnHumanShotOutcome)
-        for (outcome <- gameOutcome) logListView.addLines(outcome)
+        for (outcome <- gameOutcome) logPanel.addLines(outcome)
       }
     }
 
@@ -126,17 +125,24 @@ object Gui extends SimpleSwingApplication {
     computerGameView.winner().map(winner => if ("Computer" == winner) "I win!" else "You win!")
   }
 
-  class LogListView extends ListView[String] {
-    name = "log"
-
+  class LogPanel extends ScrollPane {
     var logLines: ListBuffer[String] = ListBuffer[String]()
+
+    val listView = new ListView[String] {
+      name = "log"
+    }
+    contents = listView
+
+    preferredSize = new Dimension(preferredSize.width, 40)
 
     def addLines(lines: String*) {
       for (line <- lines) {
         logLines += "" + (logLines.size+1) + ". " + line
       }
 
-      listData = logLines
+      listView.listData = logLines
+      listView.revalidate()
+      verticalScrollBar.value = verticalScrollBar.maximum
     }
   }
 }
