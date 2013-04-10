@@ -18,12 +18,7 @@ class GameView(val transport: Transport, val playerId: String) {
         if (leftBorder == -1 || rightBorder == -1) None else Some(line.substring(leftBorder + 1, rightBorder))
     }.flatten.map(_.zipWithIndex.filter(_._2 % 2 == 0).map(_._1).mkString)
 
-    val entries = payload.zipWithIndex.map {
-      lineAndIndex => lineAndIndex._1.zipWithIndex.map {
-        charAndIndex => pos(charAndIndex._2 + 1, lineAndIndex._2 + 1) -> charAndIndex._1.toString
-      }
-    }.flatten
-    Map(entries: _*)
+    GameView.convertBoardPayloadToMap(payload)
   }
 
   def shootOpponent(column: Int, row: Int): ShotOutcome.Value = {
@@ -70,5 +65,14 @@ object GameView {
 
     val gameTransport: Transport = transport.sub("/game/" + gameId)
     (new GameView(gameTransport, "You"), new GameView(gameTransport, "Computer"))
+  }
+
+  def convertBoardPayloadToMap(payload: Array[String]): Map[Position, String] = {
+    val entries = payload.zipWithIndex.map {
+      lineAndIndex => lineAndIndex._1.zipWithIndex.map {
+        charAndIndex => pos(charAndIndex._2 + 1, lineAndIndex._2 + 1) -> charAndIndex._1.toString
+      }
+    }.flatten
+    Map(entries: _*)
   }
 }

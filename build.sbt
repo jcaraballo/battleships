@@ -15,5 +15,8 @@ libraryDependencies ++= Seq(
   "net.databinder.dispatch" %% "dispatch-core" % "0.9.5",
   "org.eclipse.jetty" % "jetty-server" % "9.0.0.M4",
   "org.eclipse.jetty" % "jetty-servlet" % "9.0.0.M4",
-  "commons-io" % "commons-io" % "2.4"
+  "commons-io" % "commons-io" % "2.4",
+  "org.scala-lang" % "scala-swing" % "2.10.1",
+  "com.googlecode.windowlicker" % "windowlicker-core" % "r268",
+  "com.googlecode.windowlicker" % "windowlicker-swing" % "r268"
 )
