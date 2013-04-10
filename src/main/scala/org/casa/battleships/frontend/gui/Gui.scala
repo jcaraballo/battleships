@@ -130,19 +130,20 @@ object Gui extends SimpleSwingApplication {
 
     val listView = new ListView[String] {
       name = "log"
+      visibleRowCount = 2
     }
     contents = listView
 
-    preferredSize = new Dimension(preferredSize.width, 40)
-
     def addLines(lines: String*) {
       for (line <- lines) {
-        logLines += "" + (logLines.size+1) + ". " + line
+        logLines += "" + (logLines.size + 1) + ". " + line
       }
 
       listView.listData = logLines
       listView.revalidate()
-      verticalScrollBar.value = verticalScrollBar.maximum
+
+      listView.ensureIndexIsVisible(logLines.size - 1)
     }
   }
+
 }
