@@ -82,8 +82,6 @@ class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach w
     val future = master.ask(MasterActor.Request(Set(FleetConfiguration(availability))))
     Await.result(future, duration) match {
       case response: MasterActor.Response => response.allFleetLocations
-
-      case unexpected => throw new IllegalStateException("Got unexpected response back" + unexpected)
     }
   }
 }

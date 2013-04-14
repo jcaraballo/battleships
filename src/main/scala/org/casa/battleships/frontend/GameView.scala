@@ -47,9 +47,9 @@ class GameView(val transport: Transport, val playerId: String) {
 
   def winner(): Option[String] = {
     transport.getWithStatusCode("/winner") match {
-      case (200, response) => Some(response.trim)
+      case (200, responseBody) => Some(responseBody.trim)
       case (404, _) => None
-      case (code, response) => throw new RuntimeException("Unexpected response " +(code, response))
+      case response @ (code, responseBody) => throw new RuntimeException("Unexpected response " + response)
     }
   }
 

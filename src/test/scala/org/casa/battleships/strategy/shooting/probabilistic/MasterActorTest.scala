@@ -55,8 +55,6 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
     val future: Future[Any] = master ? MasterActor.Request(Set(fleetConfiguration))
     Await.result(future, 20 seconds) match {
       case response: MasterActor.Response => response should equal(MasterActor.Response(Set(fleetLocation1, fleetLocation2)))
-
-      case unexpected => throw new IllegalStateException("Got unexpected response back" + unexpected)
     }
   }
 
