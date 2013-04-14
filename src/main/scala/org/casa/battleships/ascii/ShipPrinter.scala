@@ -23,14 +23,14 @@ class ShipPrinter(
     }
 
     val X = true
-    val o = false
+    val O = false
 
     if(location.isHorizontal){
       val neighbourhood = (location.contains(position.left), true, location.contains(position.right))
       neighbourhood match {
         case (X, X, X) => horizontalMiddle
-        case (X, X, o) => rightEnd
-        case (o, X, X) => leftEnd
+        case (X, X, O) => rightEnd
+        case (O, X, X) => leftEnd
         case _ => throw new IllegalArgumentException("Invalid ship: " + ship)
       }
 
@@ -44,9 +44,9 @@ class ShipPrinter(
         case (
             X,
             X,
-            o) => bottomEnd
+            O) => bottomEnd
         case (
-            o,
+            O,
             X,
             X) => topEnd
         case _ => throw new IllegalArgumentException("Invalid ship: " + ship)
