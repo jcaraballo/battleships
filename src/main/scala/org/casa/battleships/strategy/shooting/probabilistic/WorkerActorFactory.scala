@@ -2,6 +2,6 @@ package org.casa.battleships.strategy.shooting.probabilistic
 
 import akka.actor.ActorRef
 
-trait ActorFactory {
+trait WorkerActorFactory {
   def create: ActorRef
 }

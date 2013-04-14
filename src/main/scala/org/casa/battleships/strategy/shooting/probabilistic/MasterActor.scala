@@ -6,7 +6,7 @@ import akka.event.Logging
 import org.casa.battleships.fleet.{Bag, FleetLocation}
 import akka.actor.{ActorRef, Actor}
 
-class MasterActor(workerFactory: ActorFactory)(shipSizes: Bag[Int]) extends Actor {
+class MasterActor(workerFactory: WorkerActorFactory)(shipSizes: Bag[Int]) extends Actor {
   import context._
 
   val log = Logging(system, this)

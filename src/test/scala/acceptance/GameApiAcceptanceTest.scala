@@ -198,12 +198,7 @@ class GameApiAcceptanceTest extends FunSuite with ShouldMatchers with BeforeAndA
       val shotPart: String = split(0)
       val coordinates: Array[String] = shotPart.substring(1, shotPart.length - 1).split(", ")
       val shot: Position = pos(coordinates(0).toInt, coordinates(1).toInt)
-      val outcome: ShotOutcome.Value = split(1) match {
-        case "Hit" => ShotOutcome.Hit
-        case "Water" => ShotOutcome.Water
-        case "Sunk" => ShotOutcome.Sunk
-        case _ => throw new IllegalArgumentException
-      }
+      val outcome: ShotOutcome.Value = ShotOutcome.LookUp.fromString(split(1))
       (shot, outcome)
     }).toList
 

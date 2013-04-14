@@ -28,7 +28,7 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
   val fleetConfiguration = FleetConfiguration(someAvailability)
 
   test("Responds with the original if it is already complete") {
-    val workerFactory: ActorFactory = mock(classOf[ActorFactory])
+    val workerFactory: WorkerActorFactory = mock(classOf[WorkerActorFactory])
     val fleetLocation = mock(classOf[FleetLocation])
     when(fleetLocation.shipSizes).thenReturn(Bag(3))
     val fleetConfiguration = new FleetConfiguration(fleetLocation, someAvailability)
@@ -93,8 +93,8 @@ class MasterActorTest extends FunSuite with BeforeAndAfterEach with ShouldMatche
     }))
   }
 
-  private def factoryThatReturns(worker: ActorRef): ActorFactory = {
-    new ActorFactory {
+  private def factoryThatReturns(worker: ActorRef): WorkerActorFactory = {
+    new WorkerActorFactory {
       def create = {
         worker
       }

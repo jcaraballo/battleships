@@ -75,7 +75,7 @@ class MasterAndWorkersIntegrationTest extends FunSuite with BeforeAndAfterEach w
   }
 
   private def findThemAll(shipSizes: Bag[Int], availability: Set[Position]): Set[FleetLocation] = {
-    val workerFactory: ActorFactory = new ActorFactory {
+    val workerFactory: WorkerActorFactory = new WorkerActorFactory {
       def create: ActorRef = actorSystem.actorOf(Props(new WorkerActor(new ShipLocationMultiplyPlacer)))
     }
     master = actorSystem.actorOf(Props(new MasterActor(workerFactory)(shipSizes)), name = "master")
