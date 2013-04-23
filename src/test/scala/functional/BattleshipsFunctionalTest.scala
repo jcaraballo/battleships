@@ -19,7 +19,7 @@ class BattleshipsFunctionalTest extends FunSuite with BeforeAndAfterEach {
     server = new ApiServer(new Board(10, new FleetComposer(new UpmostAndThenLeftmostPositionChooser).create(10, Bag(5, 4, 3, 3, 2).toList).get))
     server.start()
 
-    reset
+    reset()
     configure using deterministicShooter
     configure using new Transport("http://localhost:"+server.getPort)
 
@@ -146,7 +146,7 @@ Enter your move:
     server = new ApiServer(new Board(4, new FleetComposer(new UpmostAndThenLeftmostPositionChooser).create(4, Bag(3, 2).toList).get))
     server.start()
 
-    reset
+    reset()
     configure using quickMode
     configure using deterministicShooter
     configure using new Transport("http://localhost:"+server.getPort)

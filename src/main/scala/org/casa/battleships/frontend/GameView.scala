@@ -21,8 +21,8 @@ class GameView(val transport: Transport, val playerId: String) {
     GameView.convertBoardPayloadToMap(payload)
   }
 
-  def shootOpponent(column: Int, row: Int): ShotOutcome.Value = {
-    val body = transport.post("/shot", playerId + "," + column + "," + row).trim
+  def shootOpponent(shot: Position): ShotOutcome.Value = {
+    val body = transport.post("/shot", playerId + "," + shot.column + "," + shot.row).trim
     if (!body.contains(",")) throw new IllegalArgumentException
 
     val parts: Array[String] = body.split(",")

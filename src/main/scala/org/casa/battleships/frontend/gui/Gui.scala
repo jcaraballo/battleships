@@ -3,7 +3,7 @@ package org.casa.battleships.frontend.gui
 import scala.swing._
 import collection.immutable.IndexedSeq
 import event.ButtonClicked
-import org.casa.battleships.frontend.GameView
+import org.casa.battleships.frontend.{UiArguments, Transport, GameView}
 import org.casa.battleships.{ComputerPlayer, ShotOutcome, Position}
 import org.casa.battleships.Position._
 import org.casa.battleships.strategy.shooting.{Shooters, Shooter, OneOneShooter}
@@ -18,20 +18,13 @@ object Gui extends SimpleSwingApplication {
   var computerPlayer: ComputerPlayer = _
 
   override def main(args: Array[String]) {
-    def retrieveArgument(index: Int): Option[String] = {
-      if (args.length > index && !args(index).isEmpty) Some(args(index)) else None
-    }
+    val arguments = new UiArguments(args)
 
-    val apiServerUrl = retrieveArgument(1) getOrElse "http://localhost:8080"
-    val views = GameView.createGame(new org.casa.battleships.frontend.Transport(apiServerUrl))
+    val views = GameView.createGame(arguments.transport)
     userGameView = views._1
     computerGameView = views._2
 
-    val computerShooter: Shooter = retrieveArgument(2) match {
-      case Some("deterministicShooter") => new OneOneShooter
-      case _ => (Shooters.bestShooter(new RandomPositionChooser))
-    }
-    computerPlayer = new ComputerPlayer(computerShooter, 10)
+    computerPlayer = arguments.computerPlayer
 
     super.main(args)
   }
@@ -95,11 +88,11 @@ object Gui extends SimpleSwingApplication {
       case ButtonClicked(button) if button.name.startsWith("opponent_position_") => {
         val bits = button.name.split("_")
         val humanOnComputerShot = pos(bits(2).toInt, bits(3).toInt)
-        val humanOnComputerShotOutcome = userGameView.shootOpponent(bits(2).toInt, bits(3).toInt)
+        val humanOnComputerShotOutcome = userGameView.shootOpponent(humanOnComputerShot)
         button.text = outcomeToSquareText(humanOnComputerShotOutcome)
 
         val computerOnHumanShot: Position = computerPlayer.play(computerGameView.historyOfShotsOnOpponent())
-        val computerOnHumanShotOutcome = computerGameView.shootOpponent(computerOnHumanShot.column, computerOnHumanShot.row)
+        val computerOnHumanShotOutcome = computerGameView.shootOpponent(computerOnHumanShot)
 
         userSquareButtons(computerOnHumanShot).text = outcomeToSquareText(computerOnHumanShotOutcome)
 
@@ -145,5 +138,4 @@ object Gui extends SimpleSwingApplication {
       listView.ensureIndexIsVisible(logLines.size - 1)
     }
   }
-
 }

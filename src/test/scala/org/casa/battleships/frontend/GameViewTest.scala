@@ -36,7 +36,7 @@ class GameViewTest extends FunSuite with ShouldMatchers with BeforeAndAfterEach 
 
     val view = setupHumanGameView()
 
-    view.shootOpponent(1, 5) shouldBe ShotOutcome.Hit
+    view.shootOpponent(pos(1, 5)) shouldBe ShotOutcome.Hit
   }
 
   test("Selects the history of shots on the opponent when retrieving history") {

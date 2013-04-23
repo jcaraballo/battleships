@@ -20,9 +20,9 @@ object Battleships {
   var playerGameView: GameView = _
   var computerGameView: GameView = _
 
-  reset
+  reset()
 
-  def reset {
+  def reset() {
     settings = new GameSettings
   }
 
@@ -75,11 +75,11 @@ object Battleships {
 
   def shoot(column: Int, row: Int): String = {
 
-    val humanOnComputerShotOutcome = playerGameView.shootOpponent(column, row)
+    val humanOnComputerShotOutcome = playerGameView.shootOpponent(pos(column, row))
 
     val computerOnHumanShot: Position = settings.computerPlayer.play(computerGameView.historyOfShotsOnOpponent())
 
-    val computerOnHumanShotOutcome = computerGameView.shootOpponent(computerOnHumanShot.column, computerOnHumanShot.row)
+    val computerOnHumanShotOutcome = computerGameView.shootOpponent(computerOnHumanShot)
 
     "\nUser: " + pos(column, row) + " => " + humanOnComputerShotOutcome +
       "\nComputer: " + computerOnHumanShot + " => " + computerOnHumanShotOutcome + "\n" + prompt
