@@ -45,7 +45,7 @@ object Gui extends SimpleSwingApplication {
     }
 
 
-    val userSquareButtons: mutable.LinkedHashMap[Position, Button] = mutable.LinkedHashMap((for (row <- 1 to 10; column <- 1 to 10) yield pos(column, row) -> new Button(userFleet(pos(column, row))) {
+    val userSquareButtons = mutable.LinkedHashMap[Position, Button]((for (row <- 1 to 10; column <- 1 to 10) yield pos(column, row) -> new Button(userFleet(pos(column, row))) {
       name = userSquareButtonName(column, row)
     }): _*)
 
