@@ -85,7 +85,7 @@ object Gui extends SimpleSwingApplication {
     }
 
     reactions += {
-      case ButtonClicked(button) if button.name.startsWith("opponent_position_") => {
+      case ButtonClicked(button) if button.name.startsWith("opponent_position_") =>
         val bits = button.name.split("_")
         val humanOnComputerShot = pos(bits(2).toInt, bits(3).toInt)
         val humanOnComputerShotOutcome = userGameView.shootOpponent(humanOnComputerShot)
@@ -100,7 +100,6 @@ object Gui extends SimpleSwingApplication {
           "User: " + humanOnComputerShot + " => " + humanOnComputerShotOutcome,
           "Computer: " + computerOnHumanShot + " => " + computerOnHumanShotOutcome)
         for (outcome <- gameOutcome) logPanel.addLines(outcome)
-      }
     }
 
     listenTo(opponentSquareButtons: _*)
